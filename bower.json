@@ -1,0 +1,25 @@
+{
+  "name": "jq-autocomplete",
+  "version": "0.0.1",
+  "authors": [
+    "Mickael Jeanroy <mickael.jeanroy@gmail.com>"
+  ],
+  "description": "Simple jQuery AutoComplete",
+  "main": "src/jq-autocomplete.js",
+  "keywords": [
+    "jQuery",
+    "autocomplete"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "1.8.x"
+  }
+}
