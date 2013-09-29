@@ -65,7 +65,7 @@ describe("jQuery AutoComplete Test Suite", function() {
     });
 
     it("should bind user events", function() {
-      expect(this.autocomplete.$input.on).toHaveBeenCalledWith('keyup', jasmine.any(Function));
+      expect(this.autocomplete.$input.on).toHaveBeenCalledWith('keyup.jqauto', jasmine.any(Function));
     });
 
     it("should set focus if enter key is pressed", function() {

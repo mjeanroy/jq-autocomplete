@@ -63,7 +63,7 @@
     bind: function() {
       var that = this;
 
-      this.$input.on('keyup', function(e) {
+      this.$input.on('keyup.jqauto', function(e) {
         if (e.keyCode === ENTER_KEY) {
           // Enter key
           that.select(that.idx);
