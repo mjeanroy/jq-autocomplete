@@ -1,0 +1,33 @@
+/**
+ *
+ */
+
+.jq-autocomplete-results {
+  z-index: 10;
+
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  background-color: #fff;
+  border: #ccc solid 1px;
+
+     -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+          border-radius: 5px;
+}
+
+.jq-autocomplete-item {
+  cursor: pointer;
+  padding: 1px;
+}
+
+.jq-autocomplete-item:hover,
+.jq-autocomplete-item-active {
+  background-color: #2f96b4;
+  color: #fff;
+
+     -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+          border-radius: 2px;
+}

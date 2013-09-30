@@ -6,6 +6,21 @@
 
   'use strict';
 
+  var identity = function(param) {
+    return param;
+  };
+
+  var noop = function() {
+  };
+
+  /**
+   * Plugin name in jQuery cache data.
+   * @type {string}
+   * @const
+   * @private
+   */
+  var PLUGIN_NAME = 'jqAutoComplete';
+
   /**
    * Enter Key Code.
    * @type {number}
@@ -30,6 +45,63 @@
    */
   var ARROW_UP = 38;
 
+  /**
+   * Key associated to tab on keyboard.
+   * @type {number}
+   * @const
+   * @private
+   */
+  var TAB = 9;
+
+  /**
+   * Css class use on list items.
+   * @type {string}
+   * @const
+   * @private
+   */
+  var ITEM_CLASS = 'jq-autocomplete-item';
+
+  /**
+   * Css class use on active items.
+   * @type {string}
+   * @const
+   * @private
+   */
+  var ACTIVE_CLASS = 'jq-autocomplete-item-active';
+
+  /**
+   * Css class use on result list.
+   * @type {string}
+   * @const
+   * @private
+   */
+  var RESULT_CLASS = 'jq-autocomplete-results';
+
+  /**
+   * Get attribute value of object.
+   * @param {object} obj Object to look for.
+   * @param {string} key Name of attribute.
+   * @returns {*} Value associated to key in object.
+   * @private
+   */
+  var attr = function(obj, key) {
+    if (!obj || !key) {
+      return obj;
+    }
+
+    var subKeys = key.split('.');
+    var current = obj;
+    var ln = subKeys.length;
+    for (var i = 0; i < (ln - 1); ++i) {
+      current = current[subKeys[i]];
+      if (current === null || current === undefined) {
+        return '';
+      }
+    }
+
+    return current[subKeys[ln - 1]];
+  };
+
   var AutoComplete = function(options, input) {
     this.$input = $(input);
     this.opts = options;
@@ -48,28 +120,31 @@
      * @public
      */
     init: function() {
-      // Add relative position to parent
-      this.$input.parent().css('position', 'relative');
-
-      // Get Input Position
-      var position = this.$input.offset();
-      var width = this.$input.outerWidth();
-      var height = this.$input.outerHeight();
-
-      // Add UL element to append results
-      this.$ul = $('<ul></ul>')
-        .addClass('jq-autocomplete-results')
-        .css({
-          'position': 'fixed',
-          'left': position.left,
-          'top': position.top + height,
-          'width': width
-        });
+      this.$ul = $('<ul></ul>').addClass(RESULT_CLASS);
+      this.positionResult();
 
       this.$input.after(this.$ul);
 
       // Bind User-Events
       this.bind();
+    },
+
+    /**
+     * Position result list in fixed position below input field.
+     * @public
+     */
+    positionResult: function() {
+      // Get Input Position
+      var position = this.$input.offset();
+      var width = this.$input.outerWidth();
+      var height = this.$input.outerHeight();
+
+      this.$ul.css({
+        'position': 'fixed',
+        'left': position.left,
+        'top': position.top + height,
+        'width': width
+      });
     },
 
     /**
@@ -94,7 +169,7 @@
           else {
             that.filter = filter;
             that.$ul.hide();
-            that.clearResults();
+            that.clear();
           }
         }
       });
@@ -111,7 +186,48 @@
           e.stopPropagation();
           that.highlight(that.idx - 1);
         }
+        else if (keyCode === TAB) {
+          that.select(that.idx);
+        }
       });
+
+      this.$input.on('focusout.jqauto', function() {
+        that.focus = false;
+        var $this = $(this);
+        setTimeout(function() {
+          if (!that.focus && that.$ul) {
+            that.$ul.hide();
+            if (!that.item) {
+              that.autoSelect($.trim($this.val()));
+            }
+          }
+        }, 200);
+      });
+
+      this.$input.on('focusin.jqauto', function() {
+        that.focus = true;
+        if ((!that.item) && (that.results.length > 0)) {
+          that.$ul.show();
+        }
+      });
+
+      this.$ul.on('mouseenter.jqauto', function() {
+        $(this).find('li').removeClass(ACTIVE_CLASS);
+      });
+
+      this.$ul.on('click.jqauto', 'li', function() {
+        that.select(parseInt($(this).attr('data-idx'), 10));
+        that.$input.focus();
+      });
+    },
+
+    /**
+     * Check if item is set.
+     * @returns {boolean} True if item is set, false otherwise.
+     * @public
+     */
+    itemIsEmpty: function () {
+      return this.item === undefined || this.item === null;
     },
 
     /**
@@ -122,8 +238,14 @@
     fetch: function(filter) {
       if (this.filter === filter) {
         // If filter do not change, don't do anything
-        this.$ul.show();
+        if (this.itemIsEmpty()) {
+          this.$ul.show();
+        }
         return;
+      }
+
+      if (!this.itemIsEmpty()) {
+        this.opts.unSelect.call(this);
       }
 
       // Filter changed, unset item
@@ -185,12 +307,88 @@
       this.timer = setTimeout(request, 200);
     },
 
+    /**
+     * Show current datas in results list.
+     * @param {Array<object>} datas New results to display.
+     * @public
+     */
     show: function(datas) {
+      this.results = datas;
 
+      if (datas.length === 0) {
+        this.clear();
+        return;
+      }
+
+      this.$ul.hide().empty();
+
+      for (var i = 0, ln = datas.length; i < ln; ++i) {
+        $('<li />')
+          .addClass(ITEM_CLASS)
+          .attr('data-idx', i)
+          .html(this.renderItem(datas[i]))
+          .appendTo(this.$ul);
+      }
+
+      this.$ul.show();
     },
 
+    /**
+     * Set item as selected value.
+     * @param {*} obj Object to select.
+     * @public
+     */
+    setItem: function(obj) {
+      this.item = obj;
+      this.filter = this.renderItem(obj);
+      this.$input.val(this.filter);
+      this.$ul.hide();
+      this.idx = -1;
+      this.opts.select.call(this, obj);
+    },
+
+    /**
+     * Render an item.
+     * @param {object|string|number} obj Object to render.
+     * @returns {*} Result of render function.
+     * @public
+     */
+    renderItem: function(obj) {
+      var label = this.opts.label;
+      var txt = $.isFunction(label) ? label.call(null, obj) : attr(obj, label);
+      if (txt === undefined || txt === null) {
+        txt = '';
+      }
+      return txt;
+    },
+
+    /**
+     * Select item at given index (into results list).
+     * @param {number} idx Index.
+     * @public
+     */
     select: function(idx) {
       if (idx >= 0 && idx < this.results.length) {
+        this.setItem(this.results[idx]);
+      }
+    },
+
+    /**
+     * Auto Select a result in the list of results.<br />
+     * We search for the same filter (case insensitive) in the list of results.
+     * @param {string} filter Current filter to search.
+     * @public
+     */
+    autoSelect: function(filter) {
+      var results = this.results;
+      var f = filter.toLowerCase();
+
+      for (var i = 0, ln = results.length; i < ln; ++i) {
+        var label = this.renderItem(results[i]).toLowerCase();
+        if (label === f) {
+          this.select(i);
+          return;
+        }
       }
     },
 
@@ -212,10 +410,9 @@
         idx = 0;
       }
 
-      var activeClass = 'jq-autocomplete-item-active';
       this.$ul.find('li')
-        .removeClass(activeClass)
-        .eq(idx).addClass(activeClass);
+        .removeClass(ACTIVE_CLASS)
+        .eq(idx).addClass(ACTIVE_CLASS);
 
       this.idx = idx;
     },
@@ -227,6 +424,10 @@
      * @public
      */
     clear: function() {
+      if (this.item !== undefined && this.item !== null) {
+        this.opts.unSelect.call(this);
+      }
+
       this.$ul.empty().hide();
       this.results = [];
       this.idx = -1;
@@ -240,13 +441,69 @@
     empty: function() {
       this.clear();
       this.$input.val('');
+    },
+
+    /**
+     * Unbind user events handlers.
+     * @public
+     */
+    unbind: function() {
+      this.$input.off('.jqauto');
+      this.$ul.off('.jqauto');
+    },
+
+    /**
+     * Destroy autocomplete component.
+     * @public
+     */
+    destroy: function() {
+      this.unbind();
+      this.$ul.remove();
+
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+      if (this.xhr) {
+        this.xhr.abort();
+      }
+
+      for (var i in this) {
+        if (this.hasOwnProperty(i)) {
+          this[i] = null;
+        }
+      }
     }
   };
 
   $.fn.jqAutoComplete = function(options) {
+    var that = this;
+
+    this.destroy = function() {
+      $(this).data(PLUGIN_NAME).destroy();
+      return that;
+    };
+
+    this.clear = function() {
+      $(this).data(PLUGIN_NAME).clear();
+      return that;
+    };
+
+    this.empty = function() {
+      $(this).data(PLUGIN_NAME).empty();
+      return that;
+    };
+
+    this.item = function(obj) {
+      var autocomplete = $(this).data(PLUGIN_NAME);
+      if (obj) {
+        autocomplete.setItem(obj);
+        return that;
+      }
+      return autocomplete.item;
+    };
 
     return this.each(function() {
-      var autocomplete = $(this).data('jqAutoComplete');
+      var autocomplete = $(this).data(PLUGIN_NAME);
       if (!autocomplete) {
         var opts = {};
         if (typeof options === 'object') {
@@ -255,19 +512,21 @@
         autocomplete = new AutoComplete(opts, this);
         autocomplete.init();
       }
-      $(this).data('jqAutoComplete', autocomplete);
+      $(this).data(PLUGIN_NAME, autocomplete);
     });
   };
 
   $.fn.jqAutoComplete.options = {
     url: '',
-    label: 'label',
+    label: identity,
     minSize: 3,
     method: 'GET',
     filterName: 'filter',
     limitName: 'limit',
     limit: 10,
-    datas: null
+    datas: null,
+    select: noop,
+    unSelect: noop
   };
 
 })(jQuery);
