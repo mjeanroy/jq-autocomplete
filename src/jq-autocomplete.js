@@ -102,9 +102,19 @@
     return current[subKeys[ln - 1]];
   };
 
+  var data = function($obj, data) {
+    var value = $obj.attr('data-' + data);
+    if (value === '') {
+      value = undefined;
+    }
+    return value;
+  };
+
   var AutoComplete = function(options, input) {
     this.$input = $(input);
-    this.opts = options;
+
+    // Override options with data attributes
+    this.opts = $.extend({}, options, this.readDatas());
 
     this.filter = '';
     this.results = [];
@@ -127,6 +137,32 @@
 
       // Bind User-Events
       this.bind();
+    },
+
+    /**
+     * Read data attributes used to initialize autocomplete.
+     * @return {object} Initialization object initialized with data attributes.
+     * @public
+     */
+    readDatas: function() {
+      var datas = {};
+      var $input = this.$input;
+      datas.minSize = data($input, 'min-size');
+      datas.limit = data($input, 'limit');
+      datas.url = data($input, 'url');
+      datas.method = data($input, 'method');
+      datas.limitName = data($input, 'limit-name');
+      datas.filterName = data($input, 'filter-name');
+      datas.label = data($input, 'label');
+
+      if (datas.minSize !== undefined) {
+        datas.minSize = parseInt(datas.minSize, 10);
+      }
+      if (datas.limit !== undefined) {
+        datas.limit = parseInt(datas.limit, 10);
+      }
+
+      return datas;
     },
 
     /**
@@ -505,9 +541,9 @@
     return this.each(function() {
       var autocomplete = $(this).data(PLUGIN_NAME);
       if (!autocomplete) {
-        var opts = {};
+        var opts = $.extend({}, $.fn.jqAutoComplete.options);
         if (typeof options === 'object') {
-          opts = $.extend({}, $.fn.jqAutoComplete.options, options);
+          opts = $.extend(opts, options);
         }
         autocomplete = new AutoComplete(opts, this);
         autocomplete.init();

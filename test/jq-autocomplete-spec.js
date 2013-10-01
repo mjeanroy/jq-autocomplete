@@ -24,9 +24,12 @@ describe("jQuery AutoComplete Test Suite", function() {
   });
 
   it("should initialize autocomplete", function() {
+    expect(this.$input.data('jqAutoComplete')).toBeFalsy();
+
     this.$input.jqAutoComplete({
       url: '/search'
     });
+
     expect(this.$input.data('jqAutoComplete')).toBeDefined();
 
     var ac = this.$input.data('jqAutoComplete');
@@ -37,6 +40,7 @@ describe("jQuery AutoComplete Test Suite", function() {
     expect(ac.timer).toBe(null);
     expect(ac.xhr).toBe(null);
 
+    expect(ac.opts).not.toBe($.fn.jqAutoComplete.options);
     expect(ac.opts).toEqual({
       url: '/search',
       label: jasmine.any(Function),
@@ -45,6 +49,43 @@ describe("jQuery AutoComplete Test Suite", function() {
       limit: 10,
       filterName: 'filter',
       limitName: 'limit',
+      datas: null,
+      select: jasmine.any(Function),
+      unSelect: jasmine.any(Function)
+    });
+  });
+
+   it("should initialize autocomplete with data attributes", function() {
+    expect(this.$input.data('jqAutoComplete')).toBeFalsy();
+
+    this.$input.attr('data-min-size', '2');
+    this.$input.attr('data-limit', '5');
+    this.$input.attr('data-url', '/search');
+    this.$input.attr('data-filter-name', 'myFilter');
+    this.$input.attr('data-limit-name', 'myLimit');
+    this.$input.attr('data-method', 'POST');
+    this.$input.attr('data-label', 'label');
+
+    this.$input.jqAutoComplete();
+    expect(this.$input.data('jqAutoComplete')).toBeDefined();
+
+    var ac = this.$input.data('jqAutoComplete');
+    expect(ac.$input).toBeDefined();
+    expect(ac.filter).toBe('');
+    expect(ac.results).toEqual([]);
+    expect(ac.idx).toEqual(-1);
+    expect(ac.timer).toBe(null);
+    expect(ac.xhr).toBe(null);
+
+    expect(ac.opts).not.toBe($.fn.jqAutoComplete.options);
+    expect(ac.opts).toEqual({
+      url: '/search',
+      label: 'label',
+      minSize: 2,
+      method: 'POST',
+      limit: 5,
+      filterName: 'myFilter',
+      limitName: 'myLimit',
       datas: null,
       select: jasmine.any(Function),
       unSelect: jasmine.any(Function)
