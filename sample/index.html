@@ -8,13 +8,15 @@
   <link rel="stylesheet" href="jq-autocomplete.css">
 </head>
 <body>
-Search for some awesome frameworks : <input type="text" />
+Search for some awesome frameworks (js initialization) : <input id="js-initialization" type="text" />
+<div>My Choice is : <span id="js-choice"></span></div>
 
-<div>My Choice is : <span id="choice"></span></div>
+Search for some awesome frameworks (html initialization) : <input id="html-initialization" type="text" data-url="/search" data-min-size="3" data-label="label" />
+
 <script type="text/javascript">
-  var $choice = $('#choice');
+  var $choice = $('#js-choice');
 
-  $('input').jqAutoComplete({
+  $('#js-initialization').jqAutoComplete({
     url: '/search',
     minSize: 3,
     label: 'label',
@@ -25,6 +27,8 @@ Search for some awesome frameworks : <input type="text" />
       $choice.empty();
     }
   });
+
+  $('#html-initialization').jqAutoComplete();
 </script>
 </body>
 </html>
