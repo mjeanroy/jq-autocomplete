@@ -116,6 +116,7 @@
     // Override options with data attributes
     this.opts = $.extend({}, options, this.readDatas());
 
+    this.caches = {};
     this.filter = '';
     this.results = [];
     this.idx = -1;
@@ -154,6 +155,7 @@
       datas.limitName = data($input, 'limit-name');
       datas.filterName = data($input, 'filter-name');
       datas.label = data($input, 'label');
+      datas.cache = data($input, 'cache') || false;
 
       if (datas.minSize !== undefined) {
         datas.minSize = parseInt(datas.minSize, 10);
@@ -161,6 +163,9 @@
       if (datas.limit !== undefined) {
         datas.limit = parseInt(datas.limit, 10);
       }
+      if (typeof datas.cache === 'string') {
+        datas.cache = datas.cache === 'true' ? true : false;
+      }
 
       return datas;
     },
@@ -304,43 +309,66 @@
 
       var that = this;
 
-      var request = function() {
-        // Build default parameters
-        var params = {};
+      // Use a case-insensitive cache
+      var key = filter.toLowerCase();
 
-        params[that.opts.filterName] = that.filter;
-        if (that.opts.limit > 0) {
-          params[that.opts.limitName] = that.opts.limit;
-        }
+      if (this.opts.cache && this.caches[key]) {
+        // Get from cache
+        this.show(this.caches[key]);
+      }
+      else {
+        var request = function() {
+          // Build default parameters
+          var params = {};
 
-        // Append custom datas to parameters
-        if (that.opts.datas) {
-          if (typeof that.opts.datas === 'object') {
-            params = $.extend(params, that.opts.datas);
+          params[that.opts.filterName] = that.filter;
+          if (that.opts.limit > 0) {
+            params[that.opts.limitName] = that.opts.limit;
           }
-          else if (typeof that.opts.datas === 'function') {
-            params = $.extend(params, that.opts.datas.apply(this));
+
+          // Append custom datas to parameters
+          if (that.opts.datas) {
+            if (typeof that.opts.datas === 'object') {
+              params = $.extend(params, that.opts.datas);
+            }
+            else if (typeof that.opts.datas === 'function') {
+              params = $.extend(params, that.opts.datas.apply(this));
+            }
           }
-        }
 
-        // Launch request
-        that.xhr = $.ajax({
-          url: that.opts.url,
-          type: that.opts.method,
-          dataType: 'json',
-          data: params
-        });
+          // Launch request
+          that.xhr = $.ajax({
+            url: that.opts.url,
+            type: that.opts.method,
+            dataType: 'json',
+            data: params
+          });
 
-        that.xhr.done(function(datas) {
-          that.timer = null;
-          that.xhr = null;
-          that.show(datas);
-        });
-      };
+          that.xhr.done(function(datas) {
+            that.timer = null;
+            that.xhr = null;
 
-      // Launch request in 200ms
-      // If user type something else in the meantime, request will be aborted
-      this.timer = setTimeout(request, 200);
+            if (that.opts.cache) {
+              // Store in cache
+              that.caches[key] = datas;
+            }
+
+            that.show(datas);
+          });
+        };
+
+        // Launch request in 200ms
+        // If user type something else in the meantime, request will be aborted
+        this.timer = setTimeout(request, 200);
+      }
+    },
+
+    /**
+     * Clear cache.
+     * @public
+     */
+    clearCache: function() {
+      this.caches = {};
     },
 
     /**
@@ -538,6 +566,11 @@
       return autocomplete.item;
     };
 
+    this.clearCache = function() {
+      $(this).data(PLUGIN_NAME).clearCache();
+      return that;
+    };
+
     return this.each(function() {
       var autocomplete = $(this).data(PLUGIN_NAME);
       if (!autocomplete) {
@@ -561,6 +594,7 @@
     limitName: 'limit',
     limit: 10,
     datas: null,
+    cache: false,
     select: noop,
     unSelect: noop
   };

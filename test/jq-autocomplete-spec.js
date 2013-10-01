@@ -39,6 +39,7 @@ describe("jQuery AutoComplete Test Suite", function() {
     expect(ac.idx).toEqual(-1);
     expect(ac.timer).toBe(null);
     expect(ac.xhr).toBe(null);
+    expect(ac.caches).toEqual({});
 
     expect(ac.opts).not.toBe($.fn.jqAutoComplete.options);
     expect(ac.opts).toEqual({
@@ -50,6 +51,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       filterName: 'filter',
       limitName: 'limit',
       datas: null,
+      cache: false,
       select: jasmine.any(Function),
       unSelect: jasmine.any(Function)
     });
@@ -65,6 +67,7 @@ describe("jQuery AutoComplete Test Suite", function() {
     this.$input.attr('data-limit-name', 'myLimit');
     this.$input.attr('data-method', 'POST');
     this.$input.attr('data-label', 'label');
+    this.$input.attr('data-cache', 'true');
 
     this.$input.jqAutoComplete();
     expect(this.$input.data('jqAutoComplete')).toBeDefined();
@@ -87,6 +90,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       filterName: 'myFilter',
       limitName: 'myLimit',
       datas: null,
+      cache: true,
       select: jasmine.any(Function),
       unSelect: jasmine.any(Function)
     });
@@ -139,6 +143,16 @@ describe("jQuery AutoComplete Test Suite", function() {
 
     var result = this.$input.jqAutoComplete().item();
     expect(result).toBe('foo');
+  });
+
+  it("should call clearCache function", function() {
+    this.$input.jqAutoComplete();
+    var ac = this.$input.data('jqAutoComplete');
+    spyOn(ac, 'clearCache');
+
+    var result = this.$input.jqAutoComplete().clearCache();
+    expect(ac.clearCache).toHaveBeenCalled();
+    expect(result).toBe(this.$input);
   });
 
   describe("Check Behavior of AutoComplete", function() {
@@ -582,6 +596,9 @@ describe("jQuery AutoComplete Test Suite", function() {
         var fn = jasmine.createSpy('fn');
         this.autocomplete.opts.unSelect = fn;
 
+        // Disable cache
+        this.autocomplete.opts.cache = false;
+
         this.autocomplete.fetch('foo');
 
         expect(fn).not.toHaveBeenCalled();
@@ -611,6 +628,77 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect(this.autocomplete.timer).toBe(null);
         expect(this.autocomplete.xhr).toBe(null);
         expect(this.autocomplete.show).toHaveBeenCalledWith(['foo']);
+        expect(this.autocomplete.caches['foo']).toBeUndefined();
+      });
+
+      it("should fetch results and store in cache if cache is enable", function() {
+        var fn = jasmine.createSpy('fn');
+        this.autocomplete.opts.unSelect = fn;
+
+        // Enable cache
+        this.autocomplete.opts.cache = true;
+
+        this.autocomplete.fetch('foo');
+
+        window.setTimeout.argsForCall[0][0]();
+        expect($.ajax).toHaveBeenCalledWith({
+          url: '/search',
+          type: 'GET',
+          dataType: 'json',
+          data: {
+            filter: 'foo',
+            limit: 10
+          }
+        });
+
+        expect(this.fakeAjax.abort).not.toHaveBeenCalled();
+        expect(this.fakeAjax.done).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.autocomplete.show).not.toHaveBeenCalled();
+
+        this.fakeAjax.done.argsForCall[0][0](['foo']);
+        expect(this.autocomplete.timer).toBe(null);
+        expect(this.autocomplete.xhr).toBe(null);
+        expect(this.autocomplete.show).toHaveBeenCalledWith(['foo']);
+        expect(this.autocomplete.caches['foo']).toEqual(['foo']);
+      });
+
+      it("should not call fetch if cache is enable and result has been fetched", function() {
+        var fn = jasmine.createSpy('fn');
+        this.autocomplete.opts.unSelect = fn;
+
+        // Enable cache
+        this.autocomplete.opts.cache = true;
+        this.autocomplete.caches['foo'] = ['foo'];
+
+        this.autocomplete.fetch('foo');
+
+        expect(window.setTimeout).not.toHaveBeenCalled();
+        expect(this.autocomplete.show).toHaveBeenCalledWith(['foo']);
+        expect(this.autocomplete.caches['foo']).toEqual(['foo']);
+      });
+
+      it("should not call fetch if cache is enable and result has been fetched and is case-insensitive", function() {
+        var fn = jasmine.createSpy('fn');
+        this.autocomplete.opts.unSelect = fn;
+
+        // Enable cache
+        this.autocomplete.opts.cache = true;
+        this.autocomplete.caches['foo'] = ['foo'];
+
+        this.autocomplete.fetch('FOO');
+
+        expect(window.setTimeout).not.toHaveBeenCalled();
+        expect(this.autocomplete.show).toHaveBeenCalledWith(['foo']);
+        expect(this.autocomplete.caches['foo']).toEqual(['foo']);
+      });
+
+       it("should clear cache", function() {
+        // Enable cache
+        this.autocomplete.opts.cache = true;
+        this.autocomplete.caches['foo'] = ['foo'];
+
+        this.autocomplete.clearCache();
+        expect(this.autocomplete.caches).toEqual({});
       });
 
       it("should fetch results and call callback if an item was selected", function() {
