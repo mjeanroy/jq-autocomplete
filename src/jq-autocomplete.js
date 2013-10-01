@@ -176,9 +176,10 @@
      */
     positionResult: function() {
       // Get Input Position
-      var position = this.$input.offset();
-      var width = this.$input.outerWidth();
-      var height = this.$input.outerHeight();
+      var $input = this.$input;
+      var position = $input.offset();
+      var width = $input.outerWidth();
+      var height = $input.outerHeight();
 
       this.$ul.css({
         'position': 'fixed',
