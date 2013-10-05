@@ -12,6 +12,8 @@ module.exports = function(grunt) {
 
     pkg: grunt.file.readJSON('package.json'),
 
+    clean: ['build/'],
+
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
@@ -73,6 +75,9 @@ module.exports = function(grunt) {
 
   });
 
+  // Load clean task
+  grunt.loadNpmTasks('grunt-contrib-clean');
+
   // Load the plugin that provides the "uglify" task.
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
@@ -101,6 +106,7 @@ module.exports = function(grunt) {
 
   // Default task(s).
   grunt.registerTask('build', [
+    'clean',
     'jshint',
     'karma:continuous',
     'uglify',
