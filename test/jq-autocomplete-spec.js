@@ -387,14 +387,17 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         expect($li1.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li1.attr('data-idx')).toBe('0');
+        expect($li1.attr('title')).toBe('foo');
         expect($li1.html()).toBe('foo');
 
         expect($li2.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li2.attr('data-idx')).toBe('1');
+        expect($li2.attr('title')).toBe('bar');
         expect($li2.html()).toBe('bar');
 
         expect($li3.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li3.attr('data-idx')).toBe('2');
+        expect($li3.attr('title')).toBe('quix');
         expect($li3.html()).toBe('quix');
       });
 
@@ -414,14 +417,17 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         expect($li1.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li1.attr('data-idx')).toBe('0');
+        expect($li1.attr('title')).toBe('1');
         expect($li1.html()).toBe('1');
 
         expect($li2.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li2.attr('data-idx')).toBe('1');
+        expect($li2.attr('title')).toBe('2');
         expect($li2.html()).toBe('2');
 
         expect($li3.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li3.attr('data-idx')).toBe('2');
+        expect($li3.attr('title')).toBe('3');
         expect($li3.html()).toBe('3');
       });
 
@@ -450,14 +456,17 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         expect($li1.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li1.attr('data-idx')).toBe('0');
+        expect($li1.attr('title')).toBe('foo called');
         expect($li1.html()).toBe('foo called');
 
         expect($li2.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li2.attr('data-idx')).toBe('1');
+        expect($li2.attr('title')).toBe('bar called');
         expect($li2.html()).toBe('bar called');
 
         expect($li3.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li3.attr('data-idx')).toBe('2');
+        expect($li3.attr('title')).toBe('quix called');
         expect($li3.html()).toBe('quix called');
       });
 
@@ -484,14 +493,17 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         expect($li1.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li1.attr('data-idx')).toBe('0');
+        expect($li1.attr('title')).toBe('foo');
         expect($li1.html()).toBe('foo');
 
         expect($li2.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li2.attr('data-idx')).toBe('1');
+        expect($li2.attr('title')).toBe('bar');
         expect($li2.html()).toBe('bar');
 
         expect($li3.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li3.attr('data-idx')).toBe('2');
+        expect($li3.attr('title')).toBe('quix');
         expect($li3.html()).toBe('quix');
       });
 
@@ -518,14 +530,17 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         expect($li1.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li1.attr('data-idx')).toBe('0');
+        expect($li1.attr('title')).toBe('foo');
         expect($li1.html()).toBe('foo');
 
         expect($li2.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li2.attr('data-idx')).toBe('1');
+        expect($li2.attr('title')).toBe('bar');
         expect($li2.html()).toBe('bar');
 
         expect($li3.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li3.attr('data-idx')).toBe('2');
+        expect($li3.attr('title')).toBe('quix');
         expect($li3.html()).toBe('quix');
       });
 
@@ -545,14 +560,17 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         expect($li1.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li1.attr('data-idx')).toBe('0');
+        expect($li1.attr('title')).toBe('foo');
         expect($li1.html()).toBe('foo');
 
         expect($li2.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li2.attr('data-idx')).toBe('1');
+        expect($li2.attr('title')).toBe('');
         expect($li2.html()).toBe('');
 
         expect($li3.hasClass('jq-autocomplete-item')).toBe(true);
         expect($li3.attr('data-idx')).toBe('2');
+        expect($li3.attr('title')).toBe('');
         expect($li3.html()).toBe('');
       });
     });

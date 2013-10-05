@@ -388,10 +388,12 @@
       this.$ul.hide().empty();
 
       for (var i = 0, ln = datas.length; i < ln; ++i) {
+        var label = this.renderItem(datas[i]);
         $('<li />')
           .addClass(ITEM_CLASS)
           .attr('data-idx', i)
-          .html(this.renderItem(datas[i]))
+          .attr('title', label)
+          .html(label)
           .appendTo(this.$ul);
       }
 
