@@ -57,7 +57,8 @@ describe("jQuery AutoComplete Test Suite", function() {
       datas: null,
       cache: false,
       select: jasmine.any(Function),
-      unSelect: jasmine.any(Function)
+      unSelect: jasmine.any(Function),
+      focusout: jasmine.any(Function)
     });
   });
 
@@ -96,7 +97,8 @@ describe("jQuery AutoComplete Test Suite", function() {
       datas: null,
       cache: true,
       select: jasmine.any(Function),
-      unSelect: jasmine.any(Function)
+      unSelect: jasmine.any(Function),
+      focusout: jasmine.any(Function)
     });
   });
 
@@ -1080,6 +1082,8 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("hide results on focusout", function() {
+        spyOn(this.autocomplete.opts, 'focusout').andCallThrough();
+
         this.autocomplete.$input.val('foo');
         this.autocomplete.$input.trigger(this.focusout);
 
@@ -1087,11 +1091,13 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect(this.autocomplete.$ul.hide).not.toHaveBeenCalled();
         expect(this.autocomplete.positionResult).not.toHaveBeenCalled();
         expect(window.setTimeout).toHaveBeenCalledWith(jasmine.any(Function), 200);
+        expect(this.autocomplete.opts.focusout).not.toHaveBeenCalledWith(this.autocomplete.item);
 
         window.setTimeout.argsForCall[0][0]();
         expect(this.autocomplete.$ul.hide).toHaveBeenCalled();
         expect(this.autocomplete.positionResult).not.toHaveBeenCalled();
         expect(this.autocomplete.autoSelect).toHaveBeenCalledWith('foo');
+        expect(this.autocomplete.opts.focusout).toHaveBeenCalledWith(this.autocomplete.item);
       });
 
       it("should fetch results if filter is long enough", function() {
