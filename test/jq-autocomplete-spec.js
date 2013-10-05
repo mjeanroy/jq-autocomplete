@@ -15,9 +15,13 @@ describe("jQuery AutoComplete Test Suite", function() {
     spyOn($.fn, 'off').andCallThrough();
     spyOn($.fn, 'delegate').andCallThrough();
     spyOn($.fn, 'focus').andCallThrough();
+    spyOn($.fn, 'css').andCallThrough();
+    spyOn($.fn, 'position').andCallThrough();
+    spyOn($.fn, 'offset').andCallThrough();
     spyOn($.fn, 'hide').andCallThrough();
     spyOn($.fn, 'show').andCallThrough();
     spyOn($.fn, 'empty').andCallThrough();
+    spyOn($.fn, 'parent').andCallThrough();
     spyOn($.fn, 'val').andCallThrough();
     spyOn($.fn, 'addClass').andCallThrough();
     spyOn($.fn, 'removeClass').andCallThrough();
@@ -96,6 +100,58 @@ describe("jQuery AutoComplete Test Suite", function() {
     });
   });
 
+  it("should set absolute position", function() {
+    this.$input.jqAutoComplete();
+    expect(this.$input.data('jqAutoComplete')).toBeDefined();
+
+    var ac = this.$input.data('jqAutoComplete');
+
+    expect(ac.fixed).toBe(false);
+    expect(ac.position).toBe('absolute');
+    expect(this.$input.position).toHaveBeenCalled();
+    expect(this.$input.parent).toHaveBeenCalled();
+    expect(this.$input.parent().css).toHaveBeenCalledWith('position', 'relative');
+
+    expect(ac.left).toBe(0);
+    expect(ac.top).toBe(20);
+    expect(ac.width).toBe(30);
+  });
+
+  it("should set absolute position relative to another element", function() {
+    this.$input.jqAutoComplete({
+      relativeTo: 'body'
+    });
+
+    expect(this.$input.data('jqAutoComplete')).toBeDefined();
+
+    var ac = this.$input.data('jqAutoComplete');
+
+    expect(ac.fixed).toBe(false);
+    expect(ac.position).toBe('absolute');
+    expect(this.$input.position).toHaveBeenCalled();
+    expect(this.$input.parent).not.toHaveBeenCalled();
+    expect($('body').css).toHaveBeenCalledWith('position', 'relative');
+
+    expect(ac.left).toBe(0);
+    expect(ac.top).toBe(20);
+    expect(ac.width).toBe(30);
+  });
+
+  it("should set fixed position", function() {
+    this.$input.jqAutoComplete({
+      relativeTo: 'fixed'
+    });
+    expect(this.$input.data('jqAutoComplete')).toBeDefined();
+
+    var ac = this.$input.data('jqAutoComplete');
+
+    expect(ac.fixed).toBe(true);
+    expect(ac.position).toBe('fixed');
+    expect(this.$input.offset).toHaveBeenCalled();
+    expect(this.$input.parent).not.toHaveBeenCalled();
+    expect($.fn.css).not.toHaveBeenCalledWith('position', 'relative');
+  });
+
   it("should call destroy function", function() {
     this.$input.jqAutoComplete();
     var ac = this.$input.data('jqAutoComplete');
@@ -157,7 +213,12 @@ describe("jQuery AutoComplete Test Suite", function() {
 
   describe("Check Behavior of AutoComplete", function() {
     beforeEach(function() {
-      spyOn($.fn, 'offset').andReturn({
+      $.fn.offset.andReturn({
+        left: 100,
+        top: 50
+      });
+
+      $.fn.position.andReturn({
         left: 100,
         top: 50
       });
@@ -179,17 +240,6 @@ describe("jQuery AutoComplete Test Suite", function() {
       this.autocomplete = this.$input.data('jqAutoComplete');
 
       this.cssActive = 'jq-autocomplete-item-active';
-    });
-
-    it("should append ul element to display results at correct position and correct size", function() {
-      var $ul = this.$fixtures.find('ul');
-      expect($ul.length).toBe(1);
-
-      $ul = $ul.eq(0);
-      expect($ul.hasClass('jq-autocomplete-results')).toBe(true);
-      expect($ul.css('position')).toBe('fixed');
-      expect($ul.css('top')).toBe('70px');
-      expect($ul.css('left')).toBe('100px');
     });
 
     it("should bind user events", function() {
@@ -308,6 +358,56 @@ describe("jQuery AutoComplete Test Suite", function() {
       expect(this.autocomplete.results).toEqual([]);
       expect(this.autocomplete.idx).toBe(-1);
       expect(this.autocomplete.item).toBe(null);
+    });
+
+    describe("Check position of results", function() {
+      beforeEach(function() {
+        this.autocomplete.$ul.css.reset();
+      });
+
+      it("should append ul element to display results at correct position and correct size", function() {
+        var $ul = this.$fixtures.find('ul');
+        expect($ul.length).toBe(1);
+
+        $ul = $ul.eq(0);
+        expect($ul.hasClass('jq-autocomplete-results')).toBe(true);
+        expect($ul.css('position')).toBe('absolute');
+        expect($ul.css('top')).toBe('70px');
+        expect($ul.css('left')).toBe('100px');
+      });
+
+      it("should save last position", function() {
+        this.autocomplete.left = 50;
+        this.autocomplete.top = 30;
+        this.autocomplete.width = 10;
+
+        this.autocomplete.positionResult();
+
+        expect(this.autocomplete.$input.position).toHaveBeenCalled();
+
+        expect(this.autocomplete.left).toBe(100);
+        expect(this.autocomplete.top).toBe(70);
+        expect(this.autocomplete.width).toBe(30);
+
+        expect(this.autocomplete.$ul.css).toHaveBeenCalledWith({
+          position: 'absolute',
+          left: 100,
+          top: 70,
+          width: 30
+        });
+      });
+
+      it("should not call css twice if position does not change", function() {
+        this.autocomplete.positionResult();
+
+        expect(this.autocomplete.$input.position).toHaveBeenCalled();
+
+        expect(this.autocomplete.left).toBe(100);
+        expect(this.autocomplete.top).toBe(70);
+        expect(this.autocomplete.width).toBe(30);
+
+        expect(this.autocomplete.$ul.css).not.toHaveBeenCalledWith();
+      });
     });
 
     describe("Check Selection Functions", function() {

@@ -121,6 +121,10 @@
     this.results = [];
     this.idx = -1;
 
+    this.top = -1;
+    this.left = -1;
+    this.width = -1;
+
     this.timer = null;
     this.xhr = null;
   };
@@ -132,6 +136,19 @@
      */
     init: function() {
       this.$ul = $('<ul></ul>').addClass(RESULT_CLASS);
+
+      var relativeTo = this.opts.relativeTo;
+      var position = 'fixed';
+      var isFixed = !!(relativeTo === 'fixed');
+
+      if (!isFixed) {
+        var $relativeTo = relativeTo ? $(relativeTo) : this.$input.parent();
+        $relativeTo.css('position', 'relative');
+        position = 'absolute';
+      }
+
+      this.position = position;
+      this.fixed = isFixed;
       this.positionResult();
 
       this.$input.after(this.$ul);
@@ -156,6 +173,7 @@
       datas.filterName = data($input, 'filter-name');
       datas.label = data($input, 'label');
       datas.cache = data($input, 'cache') || false;
+      datas.relativeTo = data($input, 'relative-to');
 
       if (datas.minSize !== undefined) {
         datas.minSize = parseInt(datas.minSize, 10);
@@ -164,8 +182,8 @@
         datas.limit = parseInt(datas.limit, 10);
       }
       if (typeof datas.cache === 'string') {
-        datas.cache = datas.cache === 'true' ? true : false;
-      }
+        datas.cache = !!(datas.cache === 'true');
+      }
 
       return datas;
     },
@@ -177,16 +195,26 @@
     positionResult: function() {
       // Get Input Position
       var $input = this.$input;
-      var position = $input.offset();
+
+      var position = this.fixed ? $input.offset() : $input.position();
       var width = $input.outerWidth();
       var height = $input.outerHeight();
 
-      this.$ul.css({
-        'position': 'fixed',
-        'left': position.left,
-        'top': position.top + height,
-        'width': width
-      });
+      var left = position.left;
+      var top = position.top + height;
+
+      if (this.left !== left || this.top !== top || this.width !== width) {
+        this.left = left;
+        this.top = top;
+        this.width = width;
+
+        this.$ul.css({
+          'position': this.position,
+          'left': left,
+          'top': top,
+          'width': width
+        });
+      }
     },
 
     /**
@@ -268,7 +296,7 @@
      * @returns {boolean} True if item is set, false otherwise.
      * @public
      */
-    itemIsEmpty: function () {
+    itemIsEmpty: function() {
       return this.item === undefined || this.item === null;
     },
 
@@ -352,7 +380,7 @@
             if (that.opts.cache) {
               // Store in cache
               that.caches[key] = datas;
-            }
+            }
 
             that.show(datas);
           });
