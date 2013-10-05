@@ -20,8 +20,15 @@
 }
 
 .jq-autocomplete-item {
+  text-align: left;
   cursor: pointer;
   padding: 1px;
+
+  white-space: nowrap;
+  overflow: hidden;
+
+  -o-text-overflow: ellipsis;
+     text-overflow: ellipsis;
 }
 
 .jq-autocomplete-item:hover,
