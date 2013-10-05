@@ -271,6 +271,8 @@
             if (!that.item) {
               that.autoSelect($.trim($this.val()));
             }
+
+            that.opts.focusout.call(that, that.item);
           }
         }, 200);
       });
@@ -646,6 +648,7 @@
     limit: 10,
     datas: null,
     cache: false,
+    focusout: noop,
     select: noop,
     unSelect: noop
   };
