@@ -210,7 +210,7 @@
           }
           else {
             that.filter = filter;
-            that.$ul.hide();
+            that.$hide();
             that.clear();
           }
         }
@@ -238,7 +238,7 @@
         var $this = $(this);
         setTimeout(function() {
           if (!that.focus && that.$ul) {
-            that.$ul.hide();
+            that.$hide();
             if (!that.item) {
               that.autoSelect($.trim($this.val()));
             }
@@ -249,7 +249,7 @@
       this.$input.on('focusin.jqauto', function() {
         that.focus = true;
         if ((!that.item) && (that.results.length > 0)) {
-          that.$ul.show();
+          that.$show();
         }
       });
 
@@ -281,7 +281,7 @@
       if (this.filter === filter) {
         // If filter do not change, don't do anything
         if (this.itemIsEmpty()) {
-          this.$ul.show();
+          this.$show();
         }
         return;
       }
@@ -385,7 +385,7 @@
         return;
       }
 
-      this.$ul.hide().empty();
+      this.$hide().empty();
 
       for (var i = 0, ln = datas.length; i < ln; ++i) {
         var label = this.renderItem(datas[i]);
@@ -397,7 +397,26 @@
           .appendTo(this.$ul);
       }
 
-      this.$ul.show();
+      this.$show();
+    },
+
+    /**
+     * Show result list.
+     * @returns {jQuery} Result list object.
+     * @public
+     */
+    $show: function() {
+      this.positionResult();
+      return this.$ul.show();
+    },
+
+    /**
+     * Hide result list.
+     * @returns {jQuery} Result list object.
+     * @public
+     */
+    $hide: function() {
+      return this.$ul.hide();
     },
 
     /**
@@ -409,7 +428,7 @@
       this.item = obj;
       this.filter = this.renderItem(obj);
       this.$input.val(this.filter);
-      this.$ul.hide();
+      this.$hide();
       this.idx = -1;
       this.opts.select.call(this, obj);
     },
