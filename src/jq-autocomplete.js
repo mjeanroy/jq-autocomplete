@@ -5,6 +5,7 @@
 (function($) {
 
   'use strict';
+  /*jshint -W018 */
 
   var identity = function(param) {
     return param;
