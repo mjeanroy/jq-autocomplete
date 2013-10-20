@@ -3,8 +3,13 @@
  */
 
 .jq-autocomplete-results {
+  z-index: 10;
   display: none;
+  margin: 0;
+  padding: 0;
+}
 
+.jq-autocomplete-results-list {
   z-index: 10;
 
   margin: 0;

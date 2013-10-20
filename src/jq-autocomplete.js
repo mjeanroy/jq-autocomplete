@@ -54,13 +54,15 @@
    */
   var TAB = 9;
 
+  var CSS_PREFIX = 'jq-autocomplete-';
+
   /**
    * Css class use on list items.
    * @type {string}
    * @const
    * @private
    */
-  var ITEM_CLASS = 'jq-autocomplete-item';
+  var ITEM_CLASS = CSS_PREFIX + 'item';
 
   /**
    * Css class use on active items.
@@ -68,7 +70,15 @@
    * @const
    * @private
    */
-  var ACTIVE_CLASS = 'jq-autocomplete-item-active';
+  var ACTIVE_CLASS = CSS_PREFIX + 'item-active';
+
+  /**
+   * Css class use on result box.
+   * @type {string}
+   * @const
+   * @private
+   */
+  var RESULT_CLASS = CSS_PREFIX + 'results';
 
   /**
    * Css class use on result list.
@@ -76,7 +86,7 @@
    * @const
    * @private
    */
-  var RESULT_CLASS = 'jq-autocomplete-results';
+  var RESULT_LIST_CLASS = CSS_PREFIX + 'results-list';
 
   /**
    * Get attribute value of object.
@@ -136,7 +146,7 @@
      * @public
      */
     init: function() {
-      this.$ul = $('<ul></ul>').addClass(RESULT_CLASS);
+      this.$ul = $('<ul></ul>').addClass(RESULT_LIST_CLASS);
 
       var relativeTo = this.opts.relativeTo;
       var position = 'fixed';
@@ -150,9 +160,14 @@
 
       this.position = position;
       this.fixed = isFixed;
-      this.positionResult();
 
-      this.$input.after(this.$ul);
+      this.$results = $('<div></div>')
+        .addClass(RESULT_CLASS)
+        .append(this.$ul);
+
+      this.$input.after(this.$results);
+
+      this.positionResult();
 
       // Bind User-Events
       this.bind();
@@ -209,7 +224,7 @@
         this.top = top;
         this.width = width;
 
-        this.$ul.css({
+        this.$results.css({
           'position': this.position,
           'left': left,
           'top': top,
@@ -420,7 +435,8 @@
         return;
       }
 
-      this.$hide().empty();
+      this.$hide();
+      this.$ul.empty();
 
       for (var i = 0, ln = datas.length; i < ln; ++i) {
         var label = this.renderItem(datas[i]);
@@ -442,7 +458,7 @@
      */
     $show: function() {
       this.positionResult();
-      return this.$ul.show();
+      this.$results.show();
     },
 
     /**
@@ -451,7 +467,7 @@
      * @public
      */
     $hide: function() {
-      return this.$ul.hide();
+      this.$results.hide();
     },
 
     /**
@@ -549,7 +565,8 @@
         this.opts.unSelect.call(this);
       }
 
-      this.$ul.empty().hide();
+      this.$hide();
+      this.$ul.empty();
       this.results = [];
       this.idx = -1;
       this.item = null;
