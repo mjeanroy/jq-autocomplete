@@ -227,12 +227,7 @@
 
       this.$input.on('keyup.jqauto', function(e) {
         var keyCode = e.keyCode;
-        if (keyCode === ENTER_KEY) {
-          // Enter key
-          that.select(that.idx);
-          $(this).focus();
-        }
-        else if (keyCode !== ARROW_DOWN && keyCode !== ARROW_UP) {
+        if (keyCode !== ENTER_KEY && keyCode !== ARROW_DOWN && keyCode !== ARROW_UP) {
           var filter = $.trim($(this).val());
           if (filter.length >= that.opts.minSize) {
             that.fetch(filter);
@@ -256,6 +251,15 @@
           e.preventDefault();
           e.stopPropagation();
           that.highlight(that.idx - 1);
+        }
+        else if (keyCode === ENTER_KEY) {
+          if (that.idx >= 0 && that.idx < that.results.length) {
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            that.select(that.idx);
+            $(this).focus();
+          }
         }
         else if (keyCode === TAB) {
           that.select(that.idx);
