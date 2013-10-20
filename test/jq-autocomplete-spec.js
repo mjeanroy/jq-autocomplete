@@ -56,6 +56,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       limitName: 'limit',
       datas: null,
       cache: false,
+      relativeTo: null,
       select: jasmine.any(Function),
       unSelect: jasmine.any(Function),
       focusout: jasmine.any(Function)
@@ -96,6 +97,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       limitName: 'myLimit',
       datas: null,
       cache: true,
+      relativeTo: null,
       select: jasmine.any(Function),
       unSelect: jasmine.any(Function),
       focusout: jasmine.any(Function)
