@@ -1010,9 +1010,11 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         spyOn(this.keydownEvent, 'preventDefault');
         spyOn(this.keydownEvent, 'stopPropagation');
+        spyOn(this.keydownEvent, 'stopImmediatePropagation');
 
         spyOn(this.keyupEvent, 'preventDefault');
         spyOn(this.keyupEvent, 'stopPropagation');
+        spyOn(this.keyupEvent, 'stopImmediatePropagation');
 
         spyOn(this.autocomplete, 'highlight');
         spyOn(this.autocomplete, 'select');
@@ -1048,9 +1050,26 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should set focus if enter key is pressed", function() {
-        this.keyupEvent.keyCode = 13;
-        this.autocomplete.$input.trigger(this.keyupEvent);
+        this.keydownEvent.keyCode = 13;
+        this.autocomplete.idx = 0;
+        this.autocomplete.results = [
+          { id: 1 }
+        ];
+        this.autocomplete.$input.trigger(this.keydownEvent);
         expect(this.autocomplete.$input.focus).toHaveBeenCalled();
+        expect(this.keydownEvent.preventDefault).toHaveBeenCalled();
+        expect(this.keydownEvent.stopPropagation).toHaveBeenCalled();
+        expect(this.keydownEvent.stopImmediatePropagation).toHaveBeenCalled();
+      });
+
+      it("should not set focus if enter key is pressed", function() {
+        this.keydownEvent.keyCode = 13;
+        this.autocomplete.idx = -1;
+        this.autocomplete.$input.trigger(this.keydownEvent);
+        expect(this.autocomplete.$input.focus).not.toHaveBeenCalled();
+        expect(this.keydownEvent.preventDefault).not.toHaveBeenCalled();
+        expect(this.keydownEvent.stopPropagation).not.toHaveBeenCalled();
+        expect(this.keydownEvent.stopImmediatePropagation).not.toHaveBeenCalled();
       });
 
       it("should show last results on focus", function() {
