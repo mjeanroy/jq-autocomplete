@@ -14,6 +14,17 @@
   var noop = function() {
   };
 
+  var fnTrue = function() {
+    return true;
+  };
+
+  /**
+   * Namespace use to bind user events.
+   * @type {string}
+   * @const
+   */
+  var NAMESPACE = '.jqauto';
+
   /**
    * Plugin name in jQuery cache data.
    * @type {string}
@@ -87,6 +98,22 @@
    * @private
    */
   var RESULT_LIST_CLASS = CSS_PREFIX + 'results-list';
+
+  /**
+   * Css class use on result list.
+   * @type {string}
+   * @const
+   * @private
+   */
+  var CREATE_LINK_CLASS = CSS_PREFIX + 'create-link';
+
+  /**
+   * Css class use on form creation.
+   * @type {string}
+   * @const
+   * @private
+   */
+  var CREATE_FORM_CLASS = CSS_PREFIX + 'create-form';
 
   /**
    * Get attribute value of object.
@@ -165,6 +192,46 @@
         .addClass(RESULT_CLASS)
         .append(this.$ul);
 
+      if (this.opts.$createForm) {
+        if (this.opts.createLabel) {
+          this.$link = $('<a></a>')
+            .attr('href', '#')
+            .addClass(CREATE_LINK_CLASS)
+            .html(this.opts.createLabel)
+            .prependTo(this.$results);
+        }
+
+        this.$form = $(this.opts.$createForm)
+          .clone()
+          .addClass(CREATE_FORM_CLASS)
+          .appendTo(this.$results);
+
+        var submitLabel = this.opts.submit;
+        var cancelLabel = this.opts.cancel;
+
+        // Append 'submit' button
+        if (submitLabel) {
+          $('<button></button>')
+            .attr('type', 'submit')
+            .attr('title', submitLabel)
+            .addClass('btn')
+            .addClass('btn-success')
+            .html(submitLabel)
+            .appendTo(this.$form);
+        }
+
+        // Append 'cancel' button
+        if (cancelLabel) {
+          this.$cancel = $('<button></button>')
+            .attr('type', 'button')
+            .attr('title', cancelLabel)
+            .addClass('btn')
+            .addClass('btn-default')
+            .html(cancelLabel)
+            .appendTo(this.$form);
+        }
+      }
+
       this.$input.after(this.$results);
 
       this.positionResult();
@@ -181,9 +248,17 @@
     readDatas: function() {
       var datas = {};
       var $input = this.$input;
+
       datas.minSize = data($input, 'min-size');
       datas.limit = data($input, 'limit');
       datas.url = data($input, 'url');
+      datas.saveUrl = data($input, 'save-url');
+      datas.saveMethod = data($input, 'save-method');
+      datas.saveDataType = data($input, 'save-data-type');
+      datas.$createForm = data($input, 'create-form');
+      datas.createLabel = data($input, 'create-label');
+      datas.cancel = data($input, 'Cancel');
+      datas.submit = data($input, 'Submit');
       datas.method = data($input, 'method');
       datas.limitName = data($input, 'limit-name');
       datas.filterName = data($input, 'filter-name');
@@ -240,7 +315,7 @@
     bind: function() {
       var that = this;
 
-      this.$input.on('keyup.jqauto', function(e) {
+      this.$input.on('keyup' + NAMESPACE, function(e) {
         var keyCode = e.keyCode;
         if (keyCode !== ENTER_KEY && keyCode !== ARROW_DOWN && keyCode !== ARROW_UP) {
           var filter = $.trim($(this).val());
@@ -255,7 +330,7 @@
         }
       });
 
-      this.$input.on('keydown.jqauto', function(e) {
+      this.$input.on('keydown' + NAMESPACE, function(e) {
         var keyCode = e.keyCode;
         if (keyCode === ARROW_DOWN) {
           e.preventDefault();
@@ -281,36 +356,55 @@
         }
       });
 
-      this.$input.on('focusout.jqauto', function() {
+      this.$input.on('focusout' + NAMESPACE, function() {
         that.focus = false;
         var $this = $(this);
         setTimeout(function() {
-          if (!that.focus && that.$ul) {
+          if (!that.focus && !that.$creation && that.$ul) {
             that.$hide();
             if (!that.item) {
               that.autoSelect($.trim($this.val()));
             }
-
             that.opts.focusout.call(that, that.item);
           }
         }, 200);
       });
 
-      this.$input.on('focusin.jqauto', function() {
+      this.$input.on('focusin' + NAMESPACE, function() {
         that.focus = true;
         if ((!that.item) && (that.results.length > 0)) {
           that.$show();
         }
       });
 
-      this.$ul.on('mouseenter.jqauto', function() {
+      this.$ul.on('mouseenter' + NAMESPACE, function() {
         $(this).find('li').removeClass(ACTIVE_CLASS);
       });
 
-      this.$ul.on('click.jqauto', 'li', function() {
+      this.$ul.on('click' + NAMESPACE, 'li', function() {
         that.select(parseInt($(this).attr('data-idx'), 10));
         that.$input.focus();
       });
+
+      if (this.$link) {
+        this.$link.on('click' + NAMESPACE, function(e) {
+          e.preventDefault();
+          that.showCreationForm();
+        });
+      }
+
+      if (this.$cancel) {
+        this.$cancel.on('click' + NAMESPACE, function() {
+          that.hideCreationForm();
+        });
+      }
+
+      if (this.$form) {
+        this.$form.on('submit' + NAMESPACE, function(e) {
+          e.preventDefault();
+          that.create();
+        });
+      }
     },
 
     /**
@@ -430,7 +524,7 @@
     show: function(datas) {
       this.results = datas;
 
-      if (datas.length === 0) {
+      if (datas.length === 0 && !this.$form) {
         this.clear();
         return;
       }
@@ -453,8 +547,7 @@
 
     /**
      * Show result list.
-     * @returns {jQuery} Result list object.
-     * @public
+     * @returns {jQuery} Result object.
      */
     $show: function() {
       this.positionResult();
@@ -463,11 +556,92 @@
 
     /**
      * Hide result list.
-     * @returns {jQuery} Result list object.
-     * @public
+     * @returns {jQuery} Result object.
      */
     $hide: function() {
+      if (this.$form) {
+        this.hideCreationForm();
+      }
       this.$results.hide();
+    },
+
+    /** Show form used to create new item. */
+    showCreationForm: function() {
+      var that = this;
+      this.$creation = true;
+      this.$ul.fadeOut('fast', function() {
+        that.$form.show();
+        that.$form.find('input').eq(0)
+          .val(that.$input.val())
+          .focus();
+      });
+    },
+
+    /** Hide form used to create new item. */
+    hideCreationForm: function() {
+      var that = this;
+      this.$creation = false;
+      this.$form.fadeOut('fast', function() {
+        that.$ul.show();
+        that.$input.focus();
+      });
+    },
+
+    /** Create new item */
+    create: function() {
+      if (this.$creation && !this.$saving) {
+        this.$saving = true;
+
+        // Check form validity
+        var array = this.$form.serializeArray();
+
+        var datas = {};
+        $.each(array, function() {
+          if (datas[this.name] !== undefined) {
+            if (!datas[this.name].push) {
+              datas[this.name] = [datas[this.name]];
+            }
+            datas[this.name].push(this.value || '');
+          } else {
+            datas[this.name] = this.value || '';
+          }
+        });
+
+        if (!this.opts.isValid(datas, this.$form)) {
+          this.$saving = false;
+          return;
+        }
+
+        // Callback
+        datas = $.extend(datas, this.opts.onSaved(datas) || {});
+
+        var url = this.opts.saveUrl || this.$form.attr('action') || this.opts.url;
+        var method = this.opts.saveMethod || this.$form.attr('method');
+        var dataType = this.opts.saveDataType;
+
+        var xhr = $.ajax({
+          url: url,
+          type: method,
+          dataType: dataType,
+          data: datas
+        });
+
+        var that = this;
+
+        xhr.done(function(data) {
+          that.opts.onSavedSuccess.apply(null, arguments);
+          that.setItem(data);
+          that.$hide();
+        });
+
+        xhr.fail(function() {
+          that.opts.onSavedFailed.apply(null, arguments);
+        });
+
+        xhr.always(function() {
+          that.$saving = false;
+        });
+      }
     },
 
     /**
@@ -661,14 +835,25 @@
 
   $.fn.jqAutoComplete.options = {
     url: '',
+    saveUrl: '',
     label: identity,
     minSize: 3,
     method: 'GET',
+    saveMethod: '',
+    saveDataType: 'json',
     filterName: 'filter',
     limitName: 'limit',
     limit: 10,
     datas: null,
     cache: false,
+    $createForm: null,
+    createLabel: 'Not here? Create it!',
+    cancel: 'Cancel',
+    submit: 'Save',
+    onSaved: identity,
+    onSavedSuccess: noop,
+    onSavedFailed: noop,
+    isValid: fnTrue,
     relativeTo: null,
     focusout: noop,
     select: noop,

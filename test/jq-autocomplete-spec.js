@@ -6,9 +6,13 @@ describe("jQuery AutoComplete Test Suite", function() {
 
   beforeEach(function() {
     this.$fixtures = $('<div><input type="text" /></div>');
+    this.$fixtures.append($('<form id="foo"></form>'));
     this.$input = this.$fixtures.find('input');
 
     // Spy jQuery
+    this.xhr = jasmine.createSpyObj('xhr', ['abort', 'done', 'fail', 'always']);
+    spyOn($, 'ajax').andReturn(this.xhr);
+
     spyOn($.fn, 'outerWidth').andReturn(30);
     spyOn($.fn, 'outerHeight').andReturn(20);
     spyOn($.fn, 'on').andCallThrough();
@@ -25,9 +29,13 @@ describe("jQuery AutoComplete Test Suite", function() {
     spyOn($.fn, 'val').andCallThrough();
     spyOn($.fn, 'addClass').andCallThrough();
     spyOn($.fn, 'removeClass').andCallThrough();
+    spyOn($.fn, 'eq').andCallThrough();
+    spyOn($.fn, 'fadeOut').andCallFake(function(speed, callback) {
+      callback.call(null);
+    });
   });
 
-  it("should initialize autocomplete", function() {
+  it("should initialize autocomplete without form", function() {
     expect(this.$input.data('jqAutoComplete')).toBeFalsy();
 
     this.$input.jqAutoComplete({
@@ -44,19 +52,31 @@ describe("jQuery AutoComplete Test Suite", function() {
     expect(ac.timer).toBe(null);
     expect(ac.xhr).toBe(null);
     expect(ac.caches).toEqual({});
+    expect(ac.$form).toBeUndefined();
 
     expect(ac.opts).not.toBe($.fn.jqAutoComplete.options);
     expect(ac.opts).toEqual({
       url: '/search',
+      saveUrl: '',
       label: jasmine.any(Function),
       minSize: 3,
       method: 'GET',
+      saveMethod: '',
+      saveDataType: 'json',
       limit: 10,
       filterName: 'filter',
       limitName: 'limit',
       datas: null,
       cache: false,
       relativeTo: null,
+      $createForm: null,
+      createLabel: 'Not here? Create it!',
+      cancel: 'Cancel',
+      submit: 'Save',
+      onSaved: jasmine.any(Function),
+      onSavedSuccess: jasmine.any(Function),
+      onSavedFailed: jasmine.any(Function),
+      isValid: jasmine.any(Function),
       select: jasmine.any(Function),
       unSelect: jasmine.any(Function),
       focusout: jasmine.any(Function)
@@ -69,6 +89,13 @@ describe("jQuery AutoComplete Test Suite", function() {
     this.$input.attr('data-min-size', '2');
     this.$input.attr('data-limit', '5');
     this.$input.attr('data-url', '/search');
+    this.$input.attr('data-save-url', '/save');
+    this.$input.attr('data-save-method', 'PUT');
+    this.$input.attr('data-save-data-type', 'json');
+    this.$input.attr('data-submit', 'Save');
+    this.$input.attr('data-cancel', 'Cancel');
+    this.$input.attr('data-create-form', '#foo');
+    this.$input.attr('data-create-label', 'Create it!');
     this.$input.attr('data-filter-name', 'myFilter');
     this.$input.attr('data-limit-name', 'myLimit');
     this.$input.attr('data-method', 'POST');
@@ -89,15 +116,26 @@ describe("jQuery AutoComplete Test Suite", function() {
     expect(ac.opts).not.toBe($.fn.jqAutoComplete.options);
     expect(ac.opts).toEqual({
       url: '/search',
+      saveUrl: '/save',
       label: 'label',
       minSize: 2,
       method: 'POST',
+      saveMethod: 'PUT',
+      saveDataType: 'json',
       limit: 5,
       filterName: 'myFilter',
       limitName: 'myLimit',
       datas: null,
       cache: true,
       relativeTo: null,
+      $createForm: '#foo',
+      createLabel: 'Create it!',
+      cancel: 'Cancel',
+      submit: 'Save',
+      onSaved: jasmine.any(Function),
+      onSavedSuccess: jasmine.any(Function),
+      onSavedFailed: jasmine.any(Function),
+      isValid: jasmine.any(Function),
       select: jasmine.any(Function),
       unSelect: jasmine.any(Function),
       focusout: jasmine.any(Function)
@@ -362,6 +400,113 @@ describe("jQuery AutoComplete Test Suite", function() {
       expect(this.autocomplete.results).toEqual([]);
       expect(this.autocomplete.idx).toBe(-1);
       expect(this.autocomplete.item).toBe(null);
+    });
+
+    describe("Check creation form", function() {
+      beforeEach(function() {
+        this.$input.removeData();
+
+        this.$input.jqAutoComplete({
+          url: '/search',
+          saveUrl: '/save',
+          $createForm: '#foo'
+        });
+
+        this.autocomplete = this.$input.data('jqAutoComplete');
+      });
+
+      it("should hide creation form if form is defined", function() {
+        spyOn(this.autocomplete, 'hideCreationForm').andCallThrough();
+        this.autocomplete.$hide();
+        expect(this.autocomplete.hideCreationForm).toHaveBeenCalled();
+      });
+
+      it("should hide creation form", function() {
+        this.autocomplete.hideCreationForm();
+
+        expect(this.autocomplete.$creation).toBe(false);
+        expect(this.autocomplete.$form.fadeOut).toHaveBeenCalledWith('fast', jasmine.any(Function));
+        expect(this.autocomplete.$ul.show).toHaveBeenCalled();
+        expect(this.autocomplete.$input.focus).toHaveBeenCalled();
+      });
+
+      it("should show creation form", function() {
+        var $input = jasmine.createSpyObj('$input', ['focus', 'val']);
+        $input.val.andReturn($input);
+        $input.focus.andReturn($input);
+
+        this.autocomplete.$form.eq.andReturn($input);
+
+        this.autocomplete.showCreationForm();
+
+        expect(this.autocomplete.$creation).toBe(true);
+        expect(this.autocomplete.$ul.fadeOut).toHaveBeenCalledWith('fast', jasmine.any(Function));
+        expect(this.autocomplete.$form.show).toHaveBeenCalled();
+        expect(this.autocomplete.$form.eq).toHaveBeenCalledWith(0);
+        expect($input.val).toHaveBeenCalled();
+        expect($input.focus).toHaveBeenCalled();
+      });
+
+      it("should create new item", function() {
+        this.autocomplete.$creation = true;
+        this.autocomplete.opts.saveMethod = 'POST';
+
+        spyOn(this.autocomplete.$form, 'serializeArray').andReturn([
+          {
+            name: 'name',
+            value: 'foo'
+          },
+          {
+            name: 'bar',
+            value: 'quix'
+          }
+        ]);
+
+        spyOn(this.autocomplete.opts, 'onSaved');
+        spyOn(this.autocomplete.opts, 'isValid').andReturn(true);
+
+        this.autocomplete.create();
+
+        var datas = {
+          name: 'foo',
+          bar: 'quix'
+        };
+
+        expect(this.autocomplete.$saving).toBe(true);
+        expect(this.autocomplete.opts.isValid).toHaveBeenCalledWith(datas, this.autocomplete.$form);
+        expect(this.autocomplete.opts.onSaved).toHaveBeenCalledWith(datas);
+        expect($.ajax).toHaveBeenCalledWith({
+          url: '/save',
+          type: 'POST',
+          data: datas,
+          dataType: 'json'
+        });
+
+        expect(this.xhr.done).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.xhr.fail).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.xhr.always).toHaveBeenCalledWith(jasmine.any(Function));
+
+        // Call fail
+        spyOn(this.autocomplete.opts, 'onSavedFailed');
+        this.xhr.fail.argsForCall[0][0]();
+        expect(this.autocomplete.$saving).toBe(true);
+        expect(this.autocomplete.opts.onSavedFailed).toHaveBeenCalled();
+
+        // Call done
+        spyOn(this.autocomplete.opts, 'onSavedSuccess');
+        spyOn(this.autocomplete, 'setItem');
+        spyOn(this.autocomplete, '$hide');
+        var item = { id: 1 };
+        this.xhr.done.argsForCall[0][0](item);
+        expect(this.autocomplete.$saving).toBe(true);
+        expect(this.autocomplete.setItem).toHaveBeenCalledWith(item);
+        expect(this.autocomplete.$hide).toHaveBeenCalled();
+        expect(this.autocomplete.opts.onSavedSuccess).toHaveBeenCalled();
+
+        // Call always
+        this.xhr.always.argsForCall[0][0]();
+        expect(this.autocomplete.$saving).toBe(false);
+      });
     });
 
     describe("Check position of results", function() {
@@ -693,14 +838,8 @@ describe("jQuery AutoComplete Test Suite", function() {
 
     describe("Check Fetching", function() {
       beforeEach(function() {
-        this.fakeAjax = {
-          abort: jasmine.createSpy('abort'),
-          done: jasmine.createSpy('done')
-        };
-
         this.timer = {};
 
-        spyOn($, 'ajax').andReturn(this.fakeAjax);
         spyOn(window, 'clearTimeout');
         spyOn(window, 'setTimeout').andReturn(this.timer);
 
@@ -757,11 +896,11 @@ describe("jQuery AutoComplete Test Suite", function() {
           }
         });
 
-        expect(this.fakeAjax.abort).not.toHaveBeenCalled();
-        expect(this.fakeAjax.done).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.xhr.abort).not.toHaveBeenCalled();
+        expect(this.xhr.done).toHaveBeenCalledWith(jasmine.any(Function));
         expect(this.autocomplete.show).not.toHaveBeenCalled();
 
-        this.fakeAjax.done.argsForCall[0][0](['foo']);
+        this.xhr.done.argsForCall[0][0](['foo']);
         expect(this.autocomplete.timer).toBe(null);
         expect(this.autocomplete.xhr).toBe(null);
         expect(this.autocomplete.show).toHaveBeenCalledWith(['foo']);
@@ -788,11 +927,11 @@ describe("jQuery AutoComplete Test Suite", function() {
           }
         });
 
-        expect(this.fakeAjax.abort).not.toHaveBeenCalled();
-        expect(this.fakeAjax.done).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.xhr.abort).not.toHaveBeenCalled();
+        expect(this.xhr.done).toHaveBeenCalledWith(jasmine.any(Function));
         expect(this.autocomplete.show).not.toHaveBeenCalled();
 
-        this.fakeAjax.done.argsForCall[0][0](['foo']);
+        this.xhr.done.argsForCall[0][0](['foo']);
         expect(this.autocomplete.timer).toBe(null);
         expect(this.autocomplete.xhr).toBe(null);
         expect(this.autocomplete.show).toHaveBeenCalledWith(['foo']);
@@ -854,19 +993,19 @@ describe("jQuery AutoComplete Test Suite", function() {
         this.autocomplete.fetch('foo');
 
         expect(window.clearTimeout).toHaveBeenCalledWith(this.timer);
-        expect(this.fakeAjax.abort).not.toHaveBeenCalled();
+        expect(this.xhr.abort).not.toHaveBeenCalled();
 
         expect(window.setTimeout).toHaveBeenCalledWith(jasmine.any(Function), 200);
         expect(this.autocomplete.timer).toBeDefined();
       });
 
       it("should abort current timeout and current request if a new is coming", function() {
-        this.autocomplete.xhr = this.fakeAjax;
+        this.autocomplete.xhr = this.xhr;
         this.autocomplete.timer = this.timer;
         this.autocomplete.fetch('foo');
 
         expect(window.clearTimeout).toHaveBeenCalledWith(this.timer);
-        expect(this.fakeAjax.abort).toHaveBeenCalled();
+        expect(this.xhr.abort).toHaveBeenCalled();
 
         expect(window.setTimeout).toHaveBeenCalledWith(jasmine.any(Function), 200);
         expect(this.autocomplete.timer).toBeDefined();

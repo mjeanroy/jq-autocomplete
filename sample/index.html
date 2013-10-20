@@ -5,7 +5,14 @@
   <script type="text/javascript" src="jquery/jquery.js"></script>
   <script type="text/javascript" src="jq-autocomplete.js"></script>
 
+  <link rel="stylesheet" href="bootstrap.css/css/bootstrap.css"/>
   <link rel="stylesheet" href="jq-autocomplete.css">
+
+  <style>
+    .form-creation {
+      display: none;
+    }
+  </style>
 </head>
 <body>
 
@@ -19,13 +26,23 @@
   Search for some awesome frameworks (html initialization) : <input id="html-initialization" type="text" data-url="/search" data-min-size="3" data-label="label" data-cache="true" />
 </div>
 
+<form class="form-creation">
+  <label for="input-framework-name">Framework Name :</label>
+  <input id="input-framework-name" type="text" name="name" required="required"/>
+
+  <label for="input-framework-version">Framework Version :</label>
+  <input id="input-framework-version" type="text" name="version" required="required"/>
+</form>
+
 <script type="text/javascript">
   var $choice = $('#js-choice');
 
   $('#js-initialization').jqAutoComplete({
     url: '/search',
+    saveUrl: '/frameworks',
     minSize: 3,
     label: 'label',
+    $createForm: '.form-creation',
     select: function (obj) {
      $choice.html(obj.label);
     },
