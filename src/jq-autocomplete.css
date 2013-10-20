@@ -7,16 +7,9 @@
   display: none;
   margin: 0;
   padding: 0;
-}
-
-.jq-autocomplete-results-list {
-  z-index: 10;
-
-  margin: 0;
-  padding: 0;
-  list-style: none;
 
   background-color: #fff;
+
   border: #ccc solid 1px;
 
      -moz-border-radius: 5px;
@@ -24,10 +17,39 @@
           border-radius: 5px;
 }
 
+.jq-autocomplete-create-form {
+  text-align: center;
+  margin: 0;
+}
+
+.jq-autocomplete-create-form input {
+  padding: 0;
+}
+
+.jq-autocomplete-create-form button {
+  padding: 2px;
+  margin: 0 2px;
+}
+
+.jq-autocomplete-create-link {
+  display: block;
+  text-decoration: none;
+  margin: 0;
+  padding: 2px 0;
+  text-align: center;
+  border-bottom: #ccc solid 1px;
+}
+
+.jq-autocomplete-results-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .jq-autocomplete-item {
   text-align: left;
   cursor: pointer;
-  padding: 1px;
+  padding: 2px 1px;
 
   white-space: nowrap;
   overflow: hidden;
@@ -36,6 +58,7 @@
      text-overflow: ellipsis;
 }
 
+.jq-autocomplete-create-link:hover,
 .jq-autocomplete-item:hover,
 .jq-autocomplete-item-active {
   background-color: #2f96b4;
