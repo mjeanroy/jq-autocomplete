@@ -371,13 +371,20 @@ describe("jQuery AutoComplete Test Suite", function() {
 
       it("should append ul element to display results at correct position and correct size", function() {
         var $ul = this.$fixtures.find('ul');
-        expect($ul.length).toBe(1);
+        var $results = this.$fixtures.find('div');
 
+        expect($ul.length).toBe(1);
+        expect($results.length).toBe(1);
+
+        $results = $results.eq(0);
         $ul = $ul.eq(0);
-        expect($ul.hasClass('jq-autocomplete-results')).toBe(true);
-        expect($ul.css('position')).toBe('absolute');
-        expect($ul.css('top')).toBe('70px');
-        expect($ul.css('left')).toBe('100px');
+
+        expect($results.hasClass('jq-autocomplete-results')).toBe(true);
+        expect($ul.hasClass('jq-autocomplete-results-list')).toBe(true);
+
+        expect($results.css('position')).toBe('absolute');
+        expect($results.css('top')).toBe('70px');
+        expect($results.css('left')).toBe('100px');
       });
 
       it("should save last position", function() {
