@@ -199,9 +199,9 @@ describe("jQuery AutoComplete Test Suite", function() {
     var ac = this.$input.data('jqAutoComplete');
     spyOn(ac, 'destroy');
 
-    var result = this.$input.jqAutoComplete().destroy();
+    this.$input.jqAutoComplete().destroy();
     expect(ac.destroy).toHaveBeenCalled();
-    expect(result).toBe(this.$input);
+    expect(this.$input.data('jqAutoComplete')).toBeUndefined();
   });
 
   it("should call clear function", function() {

@@ -791,8 +791,9 @@
     var that = this;
 
     this.destroy = function() {
-      $(this).data(PLUGIN_NAME).destroy();
-      return that;
+      var $this = $(this);
+      $this.data(PLUGIN_NAME).destroy();
+      $this.removeData(PLUGIN_NAME);
     };
 
     this.clear = function() {
