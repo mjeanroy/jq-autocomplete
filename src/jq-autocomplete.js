@@ -767,6 +767,16 @@
     empty: function() {
       this.clear();
       this.$input.val('');
+      this.resetForm();
+    },
+
+    /** Reset form values */
+    resetForm: function() {
+      if (this.$form) {
+        this.$form.find('input[type!="hidden"], select').each(function() {
+          $(this).val('');
+        });
+      }
     },
 
     /**
