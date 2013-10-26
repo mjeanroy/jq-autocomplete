@@ -386,6 +386,13 @@
         that.$input.focus();
       });
 
+      this.bindForm();
+    },
+
+    /** Bind events used to manage creation form */
+    bindForm: function() {
+      var that = this;
+
       if (this.$link) {
         this.$link.on('click' + NAMESPACE, function(e) {
           e.preventDefault();
