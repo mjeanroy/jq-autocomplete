@@ -780,6 +780,7 @@
 
     /** Destroy autocomplete component. */
     destroy: function() {
+      this.opts.onDestroyed.call(this);
       this.unbind();
       this.$ul.remove();
 
@@ -889,7 +890,8 @@
     select: noop,
     unSelect: noop,
     onShown: noop,
-    onHidden: noop
+    onHidden: noop,
+    onDestroyed: noop
   };
 
 })(jQuery);
