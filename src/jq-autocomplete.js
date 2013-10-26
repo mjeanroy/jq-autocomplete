@@ -630,7 +630,7 @@
 
         xhr.done(function(data) {
           that.opts.onSavedSuccess.apply(null, arguments);
-          that.setItem(data);
+          that.val(data);
           that.$hide();
         });
 
@@ -649,7 +649,7 @@
      * @param {*} obj Object to select.
      * @public
      */
-    setItem: function(obj) {
+    val: function(obj) {
       this.item = obj;
       this.filter = this.renderItem(obj);
       this.$input.val(this.filter);
@@ -680,7 +680,7 @@
      */
     select: function(idx) {
       if (idx >= 0 && idx < this.results.length) {
-        this.setItem(this.results[idx]);
+        this.val(this.results[idx]);
       }
     },
 
@@ -806,10 +806,10 @@
       return that;
     };
 
-    this.item = function(obj) {
+    this.val = function(obj) {
       var autocomplete = $(this).data(PLUGIN_NAME);
       if (obj) {
-        autocomplete.setItem(obj);
+        autocomplete.val(obj);
         return that;
       }
       return autocomplete.item;
