@@ -419,7 +419,7 @@
      * @returns {boolean} True if item is set, false otherwise.
      * @public
      */
-    itemIsEmpty: function() {
+    isEmpty: function() {
       return this.item === undefined || this.item === null;
     },
 
@@ -431,13 +431,13 @@
     fetch: function(filter) {
       if (this.filter === filter) {
         // If filter do not change, don't do anything
-        if (this.itemIsEmpty()) {
+        if (this.isEmpty()) {
           this.$show();
         }
         return;
       }
 
-      if (!this.itemIsEmpty()) {
+      if (!this.isEmpty()) {
         this.opts.unSelect.call(this);
       }
 
