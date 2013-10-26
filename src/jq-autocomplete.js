@@ -571,32 +571,34 @@
      * @returns {jQuery} Result object.
      */
     $hide: function() {
-      if (this.$form) {
-        this.hideCreationForm();
-      }
       this.$results.hide();
+      this.hideCreationForm();
     },
 
     /** Show form used to create new item. */
     showCreationForm: function() {
-      var that = this;
-      this.$creation = true;
-      this.$ul.fadeOut('fast', function() {
-        that.$form.show();
-        that.$form.find('input').eq(0)
-          .val(that.$input.val())
-          .focus();
-      });
+      if (this.$form) {
+        var that = this;
+        this.$creation = true;
+        this.$ul.fadeOut('fast', function() {
+          that.$form.show();
+          that.$form.find('input[type="text"]').eq(0)
+            .val(that.$input.val())
+            .focus();
+        });
+      }
     },
 
     /** Hide form used to create new item. */
     hideCreationForm: function() {
-      var that = this;
-      this.$creation = false;
-      this.$form.fadeOut('fast', function() {
-        that.$ul.show();
-        that.$input.focus();
-      });
+      if (this.$form) {
+        var that = this;
+        this.$creation = false;
+        this.$form.fadeOut('fast', function() {
+          that.$ul.show();
+          that.$input.focus();
+        });
+      }
     },
 
     /** Create new item */
