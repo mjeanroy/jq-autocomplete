@@ -550,6 +550,7 @@
     $show: function() {
       this.positionResult();
       this.$results.show();
+      this.opts.onShown.call(this);
     },
 
     /**
@@ -559,6 +560,7 @@
     $hide: function() {
       this.$results.hide();
       this.hideCreationForm();
+      this.opts.onHidden.call(this);
     },
 
     /** Show form used to create new item. */
@@ -885,7 +887,9 @@
     relativeTo: null,
     focusout: noop,
     select: noop,
-    unSelect: noop
+    unSelect: noop,
+    onShown: noop,
+    onHidden: noop
   };
 
 })(jQuery);
