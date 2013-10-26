@@ -784,8 +784,21 @@
      * @public
      */
     unbind: function() {
-      this.$input.off('.jqauto');
-      this.$ul.off('.jqauto');
+      this.$input.off(NAMESPACE);
+      this.$ul.off(NAMESPACE);
+      this.unbindForm();
+    },
+
+    unbindForm: function() {
+      if (this.$form) {
+        this.$form.off(NAMESPACE);
+      }
+      if (this.$cancel) {
+        this.$cancel.off(NAMESPACE);
+      }
+      if (this.$link) {
+        this.$link.off(NAMESPACE);
+      }
     },
 
     /**

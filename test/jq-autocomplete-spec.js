@@ -295,9 +295,31 @@ describe("jQuery AutoComplete Test Suite", function() {
     });
 
     it("should unbind user events", function() {
+      spyOn(this.autocomplete, 'unbindForm').andCallThrough();
+      this.autocomplete.$form = undefined;
+      this.autocomplete.$cancel = undefined;
+      this.autocomplete.$link = undefined;
+
       this.autocomplete.unbind();
       expect(this.autocomplete.$input.off).toHaveBeenCalledWith('.jqauto');
       expect(this.autocomplete.$ul.off).toHaveBeenCalledWith('.jqauto');
+      expect(this.autocomplete.unbindForm).toHaveBeenCalled();
+    });
+
+    it("should unbind user events and unbind form", function() {
+      spyOn(this.autocomplete, 'unbindForm').andCallThrough();
+      this.autocomplete.$form = $('<form></form>');
+      this.autocomplete.$cancel = $('<button></button>');
+      this.autocomplete.$link = $('<a href="#"/>');
+
+      this.autocomplete.unbind();
+      expect(this.autocomplete.$input.off).toHaveBeenCalledWith('.jqauto');
+      expect(this.autocomplete.$ul.off).toHaveBeenCalledWith('.jqauto');
+
+      expect(this.autocomplete.unbindForm).toHaveBeenCalled();
+      expect(this.autocomplete.$form.off).toHaveBeenCalledWith('.jqauto');
+      expect(this.autocomplete.$cancel.off).toHaveBeenCalledWith('.jqauto');
+      expect(this.autocomplete.$link.off).toHaveBeenCalledWith('.jqauto');
     });
 
     it("should destroy autocomplete", function() {
