@@ -253,6 +253,27 @@ describe("jQuery AutoComplete Test Suite", function() {
     expect(result).toBe(this.$input);
   });
 
+  it("should hide autocomplete", function() {
+    var autocomplete = this.$input.jqAutoComplete();
+
+    var ac = this.$input.data('jqAutoComplete');
+    spyOn(ac, 'hide');
+
+    autocomplete.hide();
+    expect(ac.hide).toHaveBeenCalled();
+  });
+
+  it("should show autocomplete", function() {
+    var autocomplete = this.$input.jqAutoComplete();
+
+    var datas = ['foo', 'bar'];
+    var ac = this.$input.data('jqAutoComplete');
+    spyOn(ac, 'show');
+
+    autocomplete.show(datas);
+    expect(ac.show).toHaveBeenCalledWith(datas);
+  });
+
   describe("Check Behavior of AutoComplete", function() {
     beforeEach(function() {
       $.fn.offset.andReturn({
@@ -447,6 +468,12 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should hide creation form if form is defined", function() {
+        spyOn(this.autocomplete, '$hide').andCallThrough();
+        this.autocomplete.hide();
+        expect(this.autocomplete.$hide).toHaveBeenCalled();
+      });
+
+      it("should $hide creation form if form is defined", function() {
         spyOn(this.autocomplete, 'hideCreationForm').andCallThrough();
         this.autocomplete.$hide();
         expect(this.autocomplete.hideCreationForm).toHaveBeenCalled();

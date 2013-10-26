@@ -538,6 +538,11 @@
       this.$show();
     },
 
+    /** Hide autocomplete */
+    hide: function() {
+      this.$hide();
+    },
+
     /**
      * Show result list.
      * @returns {jQuery} Result object.
@@ -821,6 +826,19 @@
         return that;
       }
       return autocomplete.item;
+    };
+
+    /** Hide autocomplete */
+    this.hide = function() {
+      $(this).data(PLUGIN_NAME).hide();
+    };
+
+    /**
+     * Show autocomplete with specified datas
+     * @param {array} datas Datas.
+     */
+    this.show = function(datas) {
+      $(this).data(PLUGIN_NAME).show(datas);
     };
 
     /** Clear autocomplete internal cache */
