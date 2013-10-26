@@ -79,7 +79,9 @@ describe("jQuery AutoComplete Test Suite", function() {
       isValid: jasmine.any(Function),
       select: jasmine.any(Function),
       unSelect: jasmine.any(Function),
-      focusout: jasmine.any(Function)
+      focusout: jasmine.any(Function),
+      onShown: jasmine.any(Function),
+      onHidden: jasmine.any(Function)
     });
   });
 
@@ -138,7 +140,9 @@ describe("jQuery AutoComplete Test Suite", function() {
       isValid: jasmine.any(Function),
       select: jasmine.any(Function),
       unSelect: jasmine.any(Function),
-      focusout: jasmine.any(Function)
+      focusout: jasmine.any(Function),
+      onShown: jasmine.any(Function),
+      onHidden: jasmine.any(Function)
     });
   });
 
@@ -381,6 +385,7 @@ describe("jQuery AutoComplete Test Suite", function() {
 
     it("should clear results and hide results list", function() {
       spyOn(this.autocomplete, 'resetForm').andCallThrough();
+      spyOn(this.autocomplete.opts, 'onHidden').andCallThrough();
 
       this.autocomplete.idx = 0;
 
@@ -396,6 +401,8 @@ describe("jQuery AutoComplete Test Suite", function() {
 
       this.autocomplete.clear();
       expect(this.autocomplete.resetForm).not.toHaveBeenCalled();
+      expect(this.autocomplete.opts.onHidden).toHaveBeenCalled();
+
       expect(this.autocomplete.$input.val).not.toHaveBeenCalled();
 
       expect(this.autocomplete.$ul.hide).toHaveBeenCalled();
@@ -410,6 +417,8 @@ describe("jQuery AutoComplete Test Suite", function() {
     });
 
     it("should clear results and hide results list and not call callback if item is was not selected", function() {
+      spyOn(this.autocomplete.opts, 'onHidden').andCallThrough();
+
       this.autocomplete.idx = 0;
 
       this.autocomplete.results = [
@@ -421,6 +430,8 @@ describe("jQuery AutoComplete Test Suite", function() {
       this.autocomplete.opts.unSelect = fn;
 
       this.autocomplete.clear();
+
+      expect(this.autocomplete.opts.onHidden).toHaveBeenCalled();
       expect(this.autocomplete.$input.val).not.toHaveBeenCalled();
 
       expect(this.autocomplete.$ul.hide).toHaveBeenCalled();
@@ -435,6 +446,7 @@ describe("jQuery AutoComplete Test Suite", function() {
 
     it("should clear results, hide results list and clear input value", function() {
       spyOn(this.autocomplete, 'resetForm').andCallThrough();
+      spyOn(this.autocomplete.opts, 'onHidden').andCallThrough();
 
       this.autocomplete.idx = 0;
       this.autocomplete.results = this.results;
@@ -442,6 +454,7 @@ describe("jQuery AutoComplete Test Suite", function() {
 
       this.autocomplete.empty();
       expect(this.autocomplete.resetForm).toHaveBeenCalled();
+      expect(this.autocomplete.opts.onHidden).toHaveBeenCalled();
       expect(this.autocomplete.$input.val).toHaveBeenCalledWith('');
       expect(this.autocomplete.$input.val()).toBe('');
 
@@ -706,11 +719,15 @@ describe("jQuery AutoComplete Test Suite", function() {
     describe("Check Show Function", function() {
       beforeEach(function() {
         spyOn(this.autocomplete, 'positionResult').andCallThrough();
+
+        spyOn(this.autocomplete.opts, 'onShown').andCallThrough();
       });
 
       it("should display some strings", function () {
         var datas = ['foo', 'bar', 'quix'];
         this.autocomplete.show(datas);
+
+        expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
         expect(this.autocomplete.results).toEqual(datas);
         expect(this.autocomplete.$ul.hide).toHaveBeenCalled();
@@ -744,6 +761,8 @@ describe("jQuery AutoComplete Test Suite", function() {
       it("should display some numbers", function () {
         var datas = [1, 2, 3];
         this.autocomplete.show(datas);
+
+        expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
         expect(this.autocomplete.results).toEqual(datas);
         expect(this.autocomplete.$ul.empty).toHaveBeenCalled();
@@ -779,6 +798,8 @@ describe("jQuery AutoComplete Test Suite", function() {
         this.autocomplete.opts.label = fn;
 
         this.autocomplete.show(datas);
+
+        expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
         expect(this.autocomplete.results).toEqual(datas);
         expect(this.autocomplete.$ul.empty).toHaveBeenCalled();
@@ -821,6 +842,8 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         this.autocomplete.show(datas);
 
+        expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
+
         expect(this.autocomplete.results).toEqual(datas);
         expect(this.autocomplete.$ul.empty).toHaveBeenCalled();
 
@@ -858,6 +881,8 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         this.autocomplete.show(datas);
 
+        expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
+
         expect(this.autocomplete.results).toEqual(datas);
         expect(this.autocomplete.$ul.empty).toHaveBeenCalled();
 
@@ -887,6 +912,8 @@ describe("jQuery AutoComplete Test Suite", function() {
       it("should not display null or undefined values", function () {
         var datas = [ 'foo', null, undefined ];
         this.autocomplete.show(datas);
+
+        expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
         expect(this.autocomplete.results).toEqual(datas);
         expect(this.autocomplete.$ul.empty).toHaveBeenCalled();
@@ -922,7 +949,8 @@ describe("jQuery AutoComplete Test Suite", function() {
         spyOn(window, 'clearTimeout');
         spyOn(window, 'setTimeout').andReturn(this.timer);
 
-        spyOn(this.autocomplete, 'show');
+        spyOn(this.autocomplete, 'show').andCallThrough();
+        spyOn(this.autocomplete.opts, 'onShown').andCallThrough();
         spyOn(this.autocomplete, 'positionResult');
       });
 
