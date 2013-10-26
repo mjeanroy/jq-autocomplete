@@ -2,7 +2,19 @@
  * jQuery AutoComplete Component.
  */
 
-(function($) {
+(function (factory) {
+
+  'use strict';
+
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['jquery'], factory);
+  } else {
+    // Browser globals
+    factory(jQuery);
+  }
+
+}(function($) {
 
   'use strict';
   /*jshint -W018 */
@@ -894,4 +906,4 @@
     onDestroyed: noop
   };
 
-})(jQuery);
+}));
