@@ -337,6 +337,8 @@ describe("jQuery AutoComplete Test Suite", function() {
     });
 
     it("should clear results and hide results list", function() {
+      spyOn(this.autocomplete, 'resetForm').andCallThrough();
+
       this.autocomplete.idx = 0;
 
       this.autocomplete.results = [
@@ -350,10 +352,12 @@ describe("jQuery AutoComplete Test Suite", function() {
       this.autocomplete.opts.unSelect = fn;
 
       this.autocomplete.clear();
+      expect(this.autocomplete.resetForm).not.toHaveBeenCalled();
       expect(this.autocomplete.$input.val).not.toHaveBeenCalled();
 
       expect(this.autocomplete.$ul.hide).toHaveBeenCalled();
       expect(this.autocomplete.$ul.empty).toHaveBeenCalled();
+      expect(this.autocomplete.$ul.html()).toBe('');
 
       expect(this.autocomplete.results).toEqual([]);
       expect(this.autocomplete.idx).toBe(-1);
@@ -387,15 +391,20 @@ describe("jQuery AutoComplete Test Suite", function() {
     });
 
     it("should clear results, hide results list and clear input value", function() {
+      spyOn(this.autocomplete, 'resetForm').andCallThrough();
+
       this.autocomplete.idx = 0;
       this.autocomplete.results = this.results;
       this.autocomplete.item = this.results[0];
 
       this.autocomplete.empty();
+      expect(this.autocomplete.resetForm).toHaveBeenCalled();
       expect(this.autocomplete.$input.val).toHaveBeenCalledWith('');
+      expect(this.autocomplete.$input.val()).toBe('');
 
       expect(this.autocomplete.$ul.hide).toHaveBeenCalled();
       expect(this.autocomplete.$ul.empty).toHaveBeenCalled();
+      expect(this.autocomplete.$ul.html()).toBe('');
 
       expect(this.autocomplete.results).toEqual([]);
       expect(this.autocomplete.idx).toBe(-1);
@@ -506,6 +515,27 @@ describe("jQuery AutoComplete Test Suite", function() {
         // Call always
         this.xhr.always.argsForCall[0][0]();
         expect(this.autocomplete.$saving).toBe(false);
+      });
+
+      it("should reset form", function() {
+        var $items = jasmine.createSpyObj('$items', ['each']);
+        spyOn($.fn, 'find').andReturn($items);
+
+        this.autocomplete.resetForm();
+        expect(this.autocomplete.$form.find).toHaveBeenCalled();
+        expect($items.each).toHaveBeenCalledWith(jasmine.any(Function));
+
+        var $item = $('<input type="text" value="foo"/>');
+        $items.each.argsForCall[0][0].call($item);
+        expect($item.val).toHaveBeenCalledWith('');
+        expect($item.val()).toBe('');
+      });
+
+      it("should not reset form if form is not set", function() {
+        spyOn($.fn, 'find')
+        this.autocomplete.$form = undefined;
+        this.autocomplete.resetForm();
+        expect($.fn.find).not.toHaveBeenCalled();
       });
     });
 
