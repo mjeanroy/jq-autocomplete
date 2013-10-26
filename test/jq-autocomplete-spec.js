@@ -81,7 +81,8 @@ describe("jQuery AutoComplete Test Suite", function() {
       unSelect: jasmine.any(Function),
       focusout: jasmine.any(Function),
       onShown: jasmine.any(Function),
-      onHidden: jasmine.any(Function)
+      onHidden: jasmine.any(Function),
+      onDestroyed: jasmine.any(Function)
     });
   });
 
@@ -142,7 +143,8 @@ describe("jQuery AutoComplete Test Suite", function() {
       unSelect: jasmine.any(Function),
       focusout: jasmine.any(Function),
       onShown: jasmine.any(Function),
-      onHidden: jasmine.any(Function)
+      onHidden: jasmine.any(Function),
+      onDestroyed: jasmine.any(Function)
     });
   });
 
@@ -349,6 +351,9 @@ describe("jQuery AutoComplete Test Suite", function() {
 
     it("should destroy autocomplete", function() {
       spyOn(this.autocomplete, 'unbind');
+      spyOn(this.autocomplete.opts, 'onDestroyed');
+
+      var onDestroyed = this.autocomplete.opts.onDestroyed;
       var unbind = this.autocomplete.unbind;
 
       this.autocomplete.results = [];
@@ -358,6 +363,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       this.autocomplete.destroy();
 
       expect(unbind).toHaveBeenCalled();
+      expect(onDestroyed).toHaveBeenCalled();
       expect(this.autocomplete.results).toBe(null);
       expect(this.autocomplete.item).toBe(null);
       expect(this.autocomplete.idx).toBe(null);
