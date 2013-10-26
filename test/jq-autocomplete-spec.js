@@ -227,10 +227,10 @@ describe("jQuery AutoComplete Test Suite", function() {
   it("should set item on autocomplete", function() {
     this.$input.jqAutoComplete();
     var ac = this.$input.data('jqAutoComplete');
-    spyOn(ac, 'setItem');
+    spyOn(ac, 'val');
 
-    var result = this.$input.jqAutoComplete().item('foo');
-    expect(ac.setItem).toHaveBeenCalledWith('foo');
+    var result = this.$input.jqAutoComplete().val('foo');
+    expect(ac.val).toHaveBeenCalledWith('foo');
     expect(result).toBe(this.$input);
   });
 
@@ -239,7 +239,7 @@ describe("jQuery AutoComplete Test Suite", function() {
     var ac = this.$input.data('jqAutoComplete');
     ac.item = 'foo';
 
-    var result = this.$input.jqAutoComplete().item();
+    var result = this.$input.jqAutoComplete().val();
     expect(result).toBe('foo');
   });
 
@@ -494,12 +494,12 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         // Call done
         spyOn(this.autocomplete.opts, 'onSavedSuccess');
-        spyOn(this.autocomplete, 'setItem');
+        spyOn(this.autocomplete, 'val');
         spyOn(this.autocomplete, '$hide');
         var item = { id: 1 };
         this.xhr.done.argsForCall[0][0](item);
         expect(this.autocomplete.$saving).toBe(true);
-        expect(this.autocomplete.setItem).toHaveBeenCalledWith(item);
+        expect(this.autocomplete.val).toHaveBeenCalledWith(item);
         expect(this.autocomplete.$hide).toHaveBeenCalled();
         expect(this.autocomplete.opts.onSavedSuccess).toHaveBeenCalled();
 
@@ -573,7 +573,7 @@ describe("jQuery AutoComplete Test Suite", function() {
         this.autocomplete.opts.select = fn;
 
         this.autocomplete.idx = 0;
-        this.autocomplete.setItem('foo');
+        this.autocomplete.val('foo');
 
         expect(this.autocomplete.item).toBe('foo');
         expect(this.autocomplete.filter).toBe('foo');
@@ -593,7 +593,7 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         this.autocomplete.opts.label = 'label';
         this.autocomplete.opts.select = fn;
-        this.autocomplete.setItem(obj);
+        this.autocomplete.val(obj);
 
         expect(this.autocomplete.item).toBe(obj);
         expect(this.autocomplete.filter).toBe('foo');
@@ -603,24 +603,24 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should select item at given index", function () {
-        spyOn(this.autocomplete, 'setItem');
+        spyOn(this.autocomplete, 'val');
 
         this.autocomplete.results = ['foo', 'bar', 'quix'];
         this.autocomplete.select(0);
 
-        expect(this.autocomplete.setItem).toHaveBeenCalledWith('foo');
+        expect(this.autocomplete.val).toHaveBeenCalledWith('foo');
       });
 
       it("should not select if index is outside of range", function () {
-        spyOn(this.autocomplete, 'setItem');
+        spyOn(this.autocomplete, 'val');
 
         this.autocomplete.results = ['foo', 'bar', 'quix'];
 
         this.autocomplete.select(-1);
-        expect(this.autocomplete.setItem).not.toHaveBeenCalled();
+        expect(this.autocomplete.val).not.toHaveBeenCalled();
 
         this.autocomplete.select(3);
-        expect(this.autocomplete.setItem).not.toHaveBeenCalled();
+        expect(this.autocomplete.val).not.toHaveBeenCalled();
       });
     });
 
