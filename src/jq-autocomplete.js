@@ -7,13 +7,16 @@
   'use strict';
   /*jshint -W018 */
 
+  /** Function that return parameter */
   var identity = function(param) {
     return param;
   };
 
+  /** No Op function */
   var noop = function() {
   };
 
+  /** Function that return always true */
   var fnTrue = function() {
     return true;
   };
@@ -29,7 +32,6 @@
    * Plugin name in jQuery cache data.
    * @type {string}
    * @const
-   * @private
    */
   var PLUGIN_NAME = 'jqAutoComplete';
 
@@ -37,7 +39,6 @@
    * Enter Key Code.
    * @type {number}
    * @const
-   * @private
    */
   var ENTER_KEY = 13;
 
@@ -45,7 +46,6 @@
    * Key associated to arrow down on keyboard.
    * @type {number}
    * @const
-   * @private
    */
   var ARROW_DOWN = 40;
 
@@ -53,7 +53,6 @@
    * Key associated to arrow up on keyboard.
    * @type {number}
    * @const
-   * @private
    */
   var ARROW_UP = 38;
 
@@ -61,7 +60,6 @@
    * Key associated to tab on keyboard.
    * @type {number}
    * @const
-   * @private
    */
   var TAB = 9;
 
@@ -71,7 +69,6 @@
    * Css class use on list items.
    * @type {string}
    * @const
-   * @private
    */
   var ITEM_CLASS = CSS_PREFIX + 'item';
 
@@ -79,7 +76,6 @@
    * Css class use on active items.
    * @type {string}
    * @const
-   * @private
    */
   var ACTIVE_CLASS = CSS_PREFIX + 'item-active';
 
@@ -87,7 +83,6 @@
    * Css class use on result box.
    * @type {string}
    * @const
-   * @private
    */
   var RESULT_CLASS = CSS_PREFIX + 'results';
 
@@ -95,7 +90,6 @@
    * Css class use on result list.
    * @type {string}
    * @const
-   * @private
    */
   var RESULT_LIST_CLASS = CSS_PREFIX + 'results-list';
 
@@ -103,7 +97,6 @@
    * Css class use on result list.
    * @type {string}
    * @const
-   * @private
    */
   var CREATE_LINK_CLASS = CSS_PREFIX + 'create-link';
 
@@ -111,7 +104,6 @@
    * Css class use on form creation.
    * @type {string}
    * @const
-   * @private
    */
   var CREATE_FORM_CLASS = CSS_PREFIX + 'create-form';
 
@@ -120,7 +112,6 @@
    * @param {object} obj Object to look for.
    * @param {string} key Name of attribute.
    * @returns {*} Value associated to key in object.
-   * @private
    */
   var attr = function(obj, key) {
     if (!obj || !key) {
@@ -140,6 +131,12 @@
     return current[subKeys[ln - 1]];
   };
 
+  /**
+   * Get data attribute value of dom element.
+   * @param {jQuery} $obj jQuery element.
+   * @param {string} data Data attribute name (without 'data-')
+   * @returns {string} Data attribute value.
+   */
   var data = function($obj, data) {
     var value = $obj.attr('data-' + data);
     if (value === '') {
@@ -168,10 +165,7 @@
   };
 
   AutoComplete.prototype = {
-    /**
-     * Initialize autocomplete.
-     * @public
-     */
+    /** Initialize autocomplete. */
     init: function() {
       this.$ul = $('<ul></ul>').addClass(RESULT_LIST_CLASS);
 
@@ -248,7 +242,6 @@
     /**
      * Read data attributes used to initialize autocomplete.
      * @return {object} Initialization object initialized with data attributes.
-     * @public
      */
     readDatas: function() {
       var datas = {};
@@ -284,10 +277,7 @@
       return datas;
     },
 
-    /**
-     * Position result list in fixed position below input field.
-     * @public
-     */
+    /** Position result list in fixed position below input field. */
     positionResult: function() {
       // Get Input Position
       var $input = this.$input;
@@ -313,10 +303,7 @@
       }
     },
 
-    /**
-     * Bind User-Events on autocomplete.
-     * @public
-     */
+    /** Bind User-Events on autocomplete. */
     bind: function() {
       var that = this;
 
@@ -422,7 +409,6 @@
     /**
      * Check if item is set.
      * @returns {boolean} True if item is set, false otherwise.
-     * @public
      */
     isEmpty: function() {
       return this.item === undefined || this.item === null;
@@ -431,7 +417,6 @@
     /**
      * Fetch results with given filter.
      * @param {string} filter Filter to fetch.
-     * @public
      */
     fetch: function(filter) {
       if (this.filter === filter) {
@@ -520,10 +505,7 @@
       }
     },
 
-    /**
-     * Clear cache.
-     * @public
-     */
+    /** Clear cache. */
     clearCache: function() {
       this.caches = {};
     },
@@ -531,7 +513,6 @@
     /**
      * Show current datas in results list.
      * @param {Array<object>} datas New results to display.
-     * @public
      */
     show: function(datas) {
       this.results = datas;
@@ -661,7 +642,6 @@
     /**
      * Set item as selected value.
      * @param {*} obj Object to select.
-     * @public
      */
     val: function(obj) {
       this.item = obj;
@@ -676,7 +656,6 @@
      * Render an item.
      * @param {object|string|number} obj Object to render.
      * @returns {*} Result of render function.
-     * @public
      */
     renderItem: function(obj) {
       var label = this.opts.label;
@@ -690,7 +669,6 @@
     /**
      * Select item at given index (into results list).
      * @param {number} idx Index.
-     * @public
      */
     select: function(idx) {
       if (idx >= 0 && idx < this.results.length) {
@@ -702,7 +680,6 @@
      * Auto Select a result in the list of results.<br />
      * We search for the same filter (case insensitive) in the list of results.
      * @param {string} filter Current filter to search.
-     * @public
      */
     autoSelect: function(filter) {
       var results = this.results;
@@ -720,7 +697,6 @@
     /**
      * Highlight item at given index.
      * @param {number} idx Index.
-     * @public
      */
     highlight: function(idx) {
       var ln = this.results.length;
@@ -746,7 +722,6 @@
      * Clear autocomplete :
      * - Clear and hide results.
      * - Reset variable storing results and current selected item.
-     * @public
      */
     clear: function() {
       if (this.item !== undefined && this.item !== null) {
@@ -760,10 +735,7 @@
       this.item = null;
     },
 
-    /**
-     * Clear autocomplete and set input to an empty string.
-     * @public
-     */
+    /** Clear autocomplete and set input to an empty string. */
     empty: function() {
       this.clear();
       this.$input.val('');
@@ -779,16 +751,14 @@
       }
     },
 
-    /**
-     * Unbind user events handlers.
-     * @public
-     */
+    /** Unbind user events handlers. */
     unbind: function() {
       this.$input.off(NAMESPACE);
       this.$ul.off(NAMESPACE);
       this.unbindForm();
     },
 
+    /** Unbind creation form */
     unbindForm: function() {
       if (this.$form) {
         this.$form.off(NAMESPACE);
@@ -801,10 +771,7 @@
       }
     },
 
-    /**
-     * Destroy autocomplete component.
-     * @public
-     */
+    /** Destroy autocomplete component. */
     destroy: function() {
       this.unbind();
       this.$ul.remove();
