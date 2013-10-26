@@ -814,22 +814,26 @@
   $.fn.jqAutoComplete = function(options) {
     var that = this;
 
+    /** Destroy autocomplete */
     this.destroy = function() {
       var $this = $(this);
       $this.data(PLUGIN_NAME).destroy();
       $this.removeData(PLUGIN_NAME);
     };
 
+    /** Clear autocomplete suggestions */
     this.clear = function() {
       $(this).data(PLUGIN_NAME).clear();
       return that;
     };
 
+    /** Empty autocomplete */
     this.empty = function() {
       $(this).data(PLUGIN_NAME).empty();
       return that;
     };
 
+    /** Get/Set value */
     this.val = function(obj) {
       var autocomplete = $(this).data(PLUGIN_NAME);
       if (obj) {
@@ -839,6 +843,7 @@
       return autocomplete.item;
     };
 
+    /** Clear autocomplete internal cache */
     this.clearCache = function() {
       $(this).data(PLUGIN_NAME).clearCache();
       return that;
