@@ -193,43 +193,7 @@
         .append(this.$ul);
 
       if (this.opts.$createForm) {
-        if (this.opts.createLabel) {
-          this.$link = $('<a></a>')
-            .attr('href', '#')
-            .addClass(CREATE_LINK_CLASS)
-            .html(this.opts.createLabel)
-            .prependTo(this.$results);
-        }
-
-        this.$form = $(this.opts.$createForm)
-          .clone()
-          .addClass(CREATE_FORM_CLASS)
-          .appendTo(this.$results);
-
-        var submitLabel = this.opts.submit;
-        var cancelLabel = this.opts.cancel;
-
-        // Append 'submit' button
-        if (submitLabel) {
-          $('<button></button>')
-            .attr('type', 'submit')
-            .attr('title', submitLabel)
-            .addClass('btn')
-            .addClass('btn-success')
-            .html(submitLabel)
-            .appendTo(this.$form);
-        }
-
-        // Append 'cancel' button
-        if (cancelLabel) {
-          this.$cancel = $('<button></button>')
-            .attr('type', 'button')
-            .attr('title', cancelLabel)
-            .addClass('btn')
-            .addClass('btn-default')
-            .html(cancelLabel)
-            .appendTo(this.$form);
-        }
+        this.appendForm();
       }
 
       this.$input.after(this.$results);
@@ -238,6 +202,47 @@
 
       // Bind User-Events
       this.bind();
+    },
+
+    /** Append creation form to custom results */
+    appendForm: function() {
+      if (this.opts.createLabel) {
+        this.$link = $('<a></a>')
+          .attr('href', '#')
+          .addClass(CREATE_LINK_CLASS)
+          .html(this.opts.createLabel)
+          .prependTo(this.$results);
+      }
+
+      this.$form = $(this.opts.$createForm)
+        .clone()
+        .addClass(CREATE_FORM_CLASS)
+        .appendTo(this.$results);
+
+      var submitLabel = this.opts.submit;
+      var cancelLabel = this.opts.cancel;
+
+      // Append 'submit' button
+      if (submitLabel) {
+        $('<button></button>')
+          .attr('type', 'submit')
+          .attr('title', submitLabel)
+          .addClass('btn')
+          .addClass('btn-success')
+          .html(submitLabel)
+          .appendTo(this.$form);
+      }
+
+      // Append 'cancel' button
+      if (cancelLabel) {
+        this.$cancel = $('<button></button>')
+          .attr('type', 'button')
+          .attr('title', cancelLabel)
+          .addClass('btn')
+          .addClass('btn-default')
+          .html(cancelLabel)
+          .appendTo(this.$form);
+      }
     },
 
     /**
