@@ -505,6 +505,7 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect(this.autocomplete.$form.fadeOut).toHaveBeenCalledWith('fast', jasmine.any(Function));
         expect(this.autocomplete.$ul.show).toHaveBeenCalled();
         expect(this.autocomplete.$input.focus).toHaveBeenCalled();
+        expect(this.autocomplete.$link.show).toHaveBeenCalled();
       });
 
       it("should show creation form", function() {
@@ -520,6 +521,7 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect(this.autocomplete.$ul.fadeOut).toHaveBeenCalledWith('fast', jasmine.any(Function));
         expect(this.autocomplete.$form.show).toHaveBeenCalled();
         expect(this.autocomplete.$form.eq).toHaveBeenCalledWith(0);
+        expect(this.autocomplete.$link.hide).toHaveBeenCalled();
         expect($input.val).toHaveBeenCalled();
         expect($input.focus).toHaveBeenCalled();
       });
