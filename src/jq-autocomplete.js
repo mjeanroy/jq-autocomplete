@@ -2,7 +2,7 @@
  * jQuery AutoComplete Component.
  */
 
-(function (factory) {
+(function(factory) {
 
   'use strict';
 
@@ -120,6 +120,13 @@
   var CREATE_FORM_CLASS = CSS_PREFIX + 'create-form';
 
   /**
+   * Css class use on wrapper for buttons.
+   * @type {string}
+   * @const
+   */
+  var FORM_BUTTONS_CLASS = CSS_PREFIX + 'create-form-buttons';
+
+  /**
    * Get attribute value of object.
    * @param {object} obj Object to look for.
    * @param {string} key Name of attribute.
@@ -228,26 +235,32 @@
       var submitLabel = this.opts.submit;
       var cancelLabel = this.opts.cancel;
 
-      // Append 'submit' button
-      if (submitLabel) {
-        $('<button></button>')
-          .attr('type', 'submit')
-          .attr('title', submitLabel)
-          .addClass('btn')
-          .addClass('btn-success')
-          .html(submitLabel)
+      if (submitLabel || cancelLabel) {
+        var $btnsWrappers = $('<div></div>')
+          .addClass(FORM_BUTTONS_CLASS)
           .appendTo(this.$form);
-      }
 
-      // Append 'cancel' button
-      if (cancelLabel) {
-        this.$cancel = $('<button></button>')
-          .attr('type', 'button')
-          .attr('title', cancelLabel)
-          .addClass('btn')
-          .addClass('btn-default')
-          .html(cancelLabel)
-          .appendTo(this.$form);
+        // Append 'submit' button
+        if (submitLabel) {
+          $('<button></button>')
+            .attr('type', 'submit')
+            .attr('title', submitLabel)
+            .addClass('btn')
+            .addClass('btn-success')
+            .html(submitLabel)
+            .appendTo($btnsWrappers);
+        }
+
+        // Append 'cancel' button
+        if (cancelLabel) {
+          this.$cancel = $('<button></button>')
+            .attr('type', 'button')
+            .attr('title', cancelLabel)
+            .addClass('btn')
+            .addClass('btn-default')
+            .html(cancelLabel)
+            .appendTo($btnsWrappers);
+        }
       }
     },
 
