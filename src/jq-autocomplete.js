@@ -594,6 +594,10 @@
         var that = this;
         this.$creation = true;
         this.$ul.fadeOut('fast', function() {
+          if (that.$link) {
+            that.$link.hide();
+          }
+
           that.$form.show();
           that.$form.find('input[type="text"]').eq(0)
             .val(that.$input.val())
@@ -608,6 +612,10 @@
         var that = this;
         this.$creation = false;
         this.$form.fadeOut('fast', function() {
+          if (that.$link) {
+            that.$link.show();
+          }
+
           that.$ul.show();
           that.$input.focus();
         });
