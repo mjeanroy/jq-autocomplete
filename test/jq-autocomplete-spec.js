@@ -499,6 +499,8 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should hide creation form", function() {
+        this.autocomplete.$creation = true;
+
         this.autocomplete.hideCreationForm();
 
         expect(this.autocomplete.$creation).toBe(false);
@@ -506,6 +508,18 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect(this.autocomplete.$ul.show).toHaveBeenCalled();
         expect(this.autocomplete.$input.focus).toHaveBeenCalled();
         expect(this.autocomplete.$link.show).toHaveBeenCalled();
+      });
+
+      it("should hide creation form if form was not visible", function() {
+        this.autocomplete.$creation = false;
+
+        this.autocomplete.hideCreationForm();
+
+        expect(this.autocomplete.$creation).toBe(false);
+        expect(this.autocomplete.$form.fadeOut).not.toHaveBeenCalled();
+        expect(this.autocomplete.$ul.show).not.toHaveBeenCalled();
+        expect(this.autocomplete.$input.focus).not.toHaveBeenCalled();
+        expect(this.autocomplete.$link.show).not.toHaveBeenCalled();
       });
 
       it("should show creation form", function() {
