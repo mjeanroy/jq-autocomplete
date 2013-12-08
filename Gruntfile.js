@@ -12,7 +12,16 @@ module.exports = function(grunt) {
 
     pkg: grunt.file.readJSON('package.json'),
 
-    clean: ['build/'],
+    clean: ['build/', 'release/'],
+
+    copy: {
+      release: {
+        expand: true,
+        cwd: 'build/',
+        src: '**',
+        dest: 'release/'
+      }
+    },
 
     uglify: {
       options: {
@@ -71,8 +80,30 @@ module.exports = function(grunt) {
       server: {
         url: 'http://localhost:<%= express.server.options.port %>'
       }
-    }
+    },
 
+    exec: {
+      prepareRelease: {
+        cmd: 'git checkout -b release-v<%= pkg.version %> && git add -f release && git commit -m "release: add build files"'
+      },
+      cleanRelease: {
+        cmd: 'git checkout master && git branch -D release-v<%= pkg.version %>'
+      }
+    },
+
+    bump: {
+      options: {
+        files: ['package.json', 'bower.json'],
+        updateConfigs: [],
+        commit: true,
+        commitMessage: 'release: v%VERSION%',
+        commitFiles: ['package.json', 'bower.json'],
+        createTag: true,
+        tagName: 'v%VERSION%',
+        tagMessage: 'Version %VERSION%',
+        push: false
+      }
+    }
   });
 
   // Load clean task
@@ -94,6 +125,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-open');
   grunt.loadNpmTasks('grunt-express');
 
+  // Load copy task
+  grunt.loadNpmTasks('grunt-contrib-copy');
+
+  // Load plugin used to create release
+  grunt.loadNpmTasks('grunt-bump');
+  grunt.loadNpmTasks('grunt-exec');
+
   grunt.registerTask('server', [
     'express:server',
     'open:server',
@@ -111,6 +149,24 @@ module.exports = function(grunt) {
     'karma:continuous',
     'uglify',
     'cssmin:minify'
+  ]);
+
+  grunt.registerTask('release:minor', [
+    'build',
+    'copy:release',
+    'exec:prepareRelease',
+    'bump:minor',
+    'exec:cleanRelease',
+    'clean'
+  ]);
+
+  grunt.registerTask('release', [
+    'build',
+    'copy:release',
+    'exec:prepareRelease',
+    'bump',
+    'exec:cleanRelease',
+    'clean'
   ]);
 
   grunt.registerTask('default', ['build']);
