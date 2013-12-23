@@ -174,6 +174,20 @@
       return parseInt(val, 10);
     };
 
+    /**
+     * Check if a string starts with another given string.
+     * @param {string} str String to check.
+     * @param {string} start Start pattern.
+     * @returns {*} True if string start with given pattern, false otherwise.
+     */
+    var startsWith = function(str, start) {
+      if (!String.prototype.startsWith) {
+        return str.indexOf(start) === 0;
+      } else {
+        return str.startsWith(start);
+      }
+    };
+
     var AutoComplete = function(options, input) {
       var that = this;
 
@@ -296,6 +310,7 @@
         datas.saveUrl = data($input, 'save-url');
         datas.saveMethod = data($input, 'save-method');
         datas.saveDataType = data($input, 'save-data-type');
+        datas.saveContentType = data($input, 'save-content-type');
         datas.$createForm = data($input, 'create-form');
         datas.createLabel = data($input, 'create-label');
         datas.cancel = data($input, 'Cancel');
@@ -680,11 +695,17 @@
           var url = that.opts.saveUrl || that.$form.attr('action') || that.opts.url;
           var method = that.opts.saveMethod || that.$form.attr('method');
           var dataType = that.opts.saveDataType;
+          var contentType = that.opts.saveContentType;
+
+          if (startsWith(contentType, 'application/json') && JSON && JSON.stringify) {
+            datas = JSON.stringify(datas);
+          }
 
           var xhr = $.ajax({
             url: url,
             type: method,
             dataType: dataType,
+            contentType: contentType,
             data: datas
           });
 
@@ -939,6 +960,7 @@
       method: 'GET',
       saveMethod: '',
       saveDataType: 'json',
+      saveContentType: 'application/x-www-form-urlencoded; charset=UTF-8',
       filterName: 'filter',
       limitName: 'limit',
       limit: 10,

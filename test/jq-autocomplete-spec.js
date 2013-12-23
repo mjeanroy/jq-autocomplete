@@ -63,6 +63,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       method: 'GET',
       saveMethod: '',
       saveDataType: 'json',
+      saveContentType: 'application/x-www-form-urlencoded; charset=UTF-8',
       limit: 10,
       filterName: 'filter',
       limitName: 'limit',
@@ -95,6 +96,7 @@ describe("jQuery AutoComplete Test Suite", function() {
     this.$input.attr('data-save-url', '/save');
     this.$input.attr('data-save-method', 'PUT');
     this.$input.attr('data-save-data-type', 'json');
+    this.$input.attr('data-save-content-type', 'application/json');
     this.$input.attr('data-submit', 'Save');
     this.$input.attr('data-cancel', 'Cancel');
     this.$input.attr('data-create-form', '#foo');
@@ -125,6 +127,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       method: 'POST',
       saveMethod: 'PUT',
       saveDataType: 'json',
+      saveContentType: 'application/json',
       limit: 5,
       filterName: 'myFilter',
       limitName: 'myLimit',
@@ -572,7 +575,76 @@ describe("jQuery AutoComplete Test Suite", function() {
           url: '/save',
           type: 'POST',
           data: datas,
-          dataType: 'json'
+          dataType: 'json',
+          contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
+        });
+
+        expect(this.xhr.done).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.xhr.fail).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.xhr.always).toHaveBeenCalledWith(jasmine.any(Function));
+
+        // Call fail
+        spyOn(this.autocomplete.opts, 'onSavedFailed');
+        this.xhr.fail.argsForCall[0][0]();
+        expect(this.autocomplete.$saving).toBe(true);
+        expect(this.autocomplete.opts.onSavedFailed).toHaveBeenCalled();
+
+        // Call done
+        spyOn(this.autocomplete.opts, 'onSavedSuccess');
+        spyOn(this.autocomplete, 'val');
+        spyOn(this.autocomplete, '$hide');
+        var item = { id: 1 };
+        this.xhr.done.argsForCall[0][0](item);
+        expect(this.autocomplete.$saving).toBe(true);
+        expect(this.autocomplete.val).toHaveBeenCalledWith(item);
+        expect(this.autocomplete.$hide).toHaveBeenCalled();
+        expect(this.autocomplete.opts.onSavedSuccess).toHaveBeenCalled();
+
+        // Call always
+        this.xhr.always.argsForCall[0][0]();
+        expect(this.autocomplete.$saving).toBe(false);
+      });
+
+      it("should create new item using json content type", function() {
+        window.JSON = jasmine.createSpyObj('JSON', ['stringify']);
+        window.JSON.stringify.andCallFake(function() {
+          return '{"name": "foo", "bar": "quix"}';
+        });
+
+        this.autocomplete.$creation = true;
+        this.autocomplete.opts.saveMethod = 'POST';
+        this.autocomplete.opts.saveContentType = 'application/json';
+
+        spyOn(this.autocomplete.$form, 'serializeArray').andReturn([
+          {
+            name: 'name',
+            value: 'foo'
+          },
+          {
+            name: 'bar',
+            value: 'quix'
+          }
+        ]);
+
+        spyOn(this.autocomplete.opts, 'onSaved');
+        spyOn(this.autocomplete.opts, 'isValid').andReturn(true);
+
+        this.autocomplete.create();
+
+        var datas = {
+          name: 'foo',
+          bar: 'quix'
+        };
+
+        expect(this.autocomplete.$saving).toBe(true);
+        expect(this.autocomplete.opts.isValid).toHaveBeenCalledWith(datas, this.autocomplete.$form);
+        expect(this.autocomplete.opts.onSaved).toHaveBeenCalledWith(datas);
+        expect($.ajax).toHaveBeenCalledWith({
+          url: '/save',
+          type: 'POST',
+          data: '{"name": "foo", "bar": "quix"}',
+          dataType: 'json',
+          contentType: 'application/json'
         });
 
         expect(this.xhr.done).toHaveBeenCalledWith(jasmine.any(Function));
