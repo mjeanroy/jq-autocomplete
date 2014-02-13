@@ -36,12 +36,13 @@ describe("jQuery AutoComplete Test Suite", function() {
   });
 
   it("should initialize autocomplete without form", function() {
+    // WHEN
     expect(this.$input.data('jqAutoComplete')).toBeFalsy();
-
     this.$input.jqAutoComplete({
       url: '/search'
     });
 
+    // THEN
     expect(this.$input.data('jqAutoComplete')).toBeDefined();
 
     var ac = this.$input.data('jqAutoComplete');
@@ -87,9 +88,8 @@ describe("jQuery AutoComplete Test Suite", function() {
     });
   });
 
-   it("should initialize autocomplete with data attributes", function() {
-    expect(this.$input.data('jqAutoComplete')).toBeFalsy();
-
+  it("should initialize autocomplete with data attributes", function() {
+    // GIVEN
     this.$input.attr('data-min-size', '2');
     this.$input.attr('data-limit', '5');
     this.$input.attr('data-url', '/search');
@@ -107,7 +107,11 @@ describe("jQuery AutoComplete Test Suite", function() {
     this.$input.attr('data-label', 'label');
     this.$input.attr('data-cache', 'true');
 
+    // WHEN
+    expect(this.$input.data('jqAutoComplete')).toBeFalsy();
     this.$input.jqAutoComplete();
+
+    // THEN
     expect(this.$input.data('jqAutoComplete')).toBeDefined();
 
     var ac = this.$input.data('jqAutoComplete');
@@ -151,136 +155,178 @@ describe("jQuery AutoComplete Test Suite", function() {
     });
   });
 
-  it("should set absolute position", function() {
+  it("should initialize autocomplete with an absolute position", function() {
+    // WHEN
     this.$input.jqAutoComplete();
+
+    // THEN
     expect(this.$input.data('jqAutoComplete')).toBeDefined();
 
-    var ac = this.$input.data('jqAutoComplete');
+    var autocomplete = this.$input.data('jqAutoComplete');
 
-    expect(ac.fixed).toBe(false);
-    expect(ac.position).toBe('absolute');
     expect(this.$input.position).toHaveBeenCalled();
     expect(this.$input.parent).toHaveBeenCalled();
     expect(this.$input.parent().css).toHaveBeenCalledWith('position', 'relative');
-
-    expect(ac.left).toBe(0);
-    expect(ac.top).toBe(20);
-    expect(ac.width).toBe(30);
+    expect(autocomplete.fixed).toBe(false);
+    expect(autocomplete.position).toBe('absolute');
+    expect(autocomplete.left).toBe(0);
+    expect(autocomplete.top).toBe(20);
+    expect(autocomplete.width).toBe(30);
   });
 
   it("should set absolute position relative to another element", function() {
-    this.$input.jqAutoComplete({
+    // GIVEN
+    var options = {
       relativeTo: 'body'
-    });
+    };
 
+    // WHEN
+    this.$input.jqAutoComplete(options);
+
+    // THEN
+    expect($('body').css).toHaveBeenCalledWith('position', 'relative');
     expect(this.$input.data('jqAutoComplete')).toBeDefined();
-
-    var ac = this.$input.data('jqAutoComplete');
-
-    expect(ac.fixed).toBe(false);
-    expect(ac.position).toBe('absolute');
     expect(this.$input.position).toHaveBeenCalled();
     expect(this.$input.parent).not.toHaveBeenCalled();
-    expect($('body').css).toHaveBeenCalledWith('position', 'relative');
 
-    expect(ac.left).toBe(0);
-    expect(ac.top).toBe(20);
-    expect(ac.width).toBe(30);
+    var autocomplete = this.$input.data('jqAutoComplete');
+    expect(autocomplete.fixed).toBe(false);
+    expect(autocomplete.position).toBe('absolute');
+    expect(autocomplete.left).toBe(0);
+    expect(autocomplete.top).toBe(20);
+    expect(autocomplete.width).toBe(30);
   });
 
   it("should set fixed position", function() {
-    this.$input.jqAutoComplete({
+    // GIVEN
+    var options = {
       relativeTo: 'fixed'
-    });
+    };
+
+    // WHEN
+    this.$input.jqAutoComplete(options);
+
+    // THEN
+    expect($.fn.css).not.toHaveBeenCalledWith('position', 'relative');
     expect(this.$input.data('jqAutoComplete')).toBeDefined();
-
-    var ac = this.$input.data('jqAutoComplete');
-
-    expect(ac.fixed).toBe(true);
-    expect(ac.position).toBe('fixed');
     expect(this.$input.offset).toHaveBeenCalled();
     expect(this.$input.parent).not.toHaveBeenCalled();
-    expect($.fn.css).not.toHaveBeenCalledWith('position', 'relative');
+
+    var autocomplete = this.$input.data('jqAutoComplete');
+    expect(autocomplete.fixed).toBe(true);
+    expect(autocomplete.position).toBe('fixed');
   });
 
   it("should call destroy function", function() {
+    // GIVEN
     this.$input.jqAutoComplete();
-    var ac = this.$input.data('jqAutoComplete');
-    spyOn(ac, 'destroy');
+    var autocomplete = this.$input.data('jqAutoComplete');
+    spyOn(autocomplete, 'destroy');
 
+    // WHEN
     this.$input.jqAutoComplete().destroy();
-    expect(ac.destroy).toHaveBeenCalled();
+
+    // THEN
+    expect(autocomplete.destroy).toHaveBeenCalled();
     expect(this.$input.data('jqAutoComplete')).toBeUndefined();
   });
 
   it("should call clear function", function() {
+    // GIVEN
     this.$input.jqAutoComplete();
-    var ac = this.$input.data('jqAutoComplete');
-    spyOn(ac, 'clear');
+    var autocomplete = this.$input.data('jqAutoComplete');
+    spyOn(autocomplete, 'clear');
 
+    // WHEN
     var result = this.$input.jqAutoComplete().clear();
-    expect(ac.clear).toHaveBeenCalled();
+
+    // THEN
+    expect(autocomplete.clear).toHaveBeenCalled();
     expect(result).toBe(this.$input);
   });
 
   it("should call empty function", function() {
+    // GIVEN
     this.$input.jqAutoComplete();
-    var ac = this.$input.data('jqAutoComplete');
-    spyOn(ac, 'empty');
+    var autocomplete = this.$input.data('jqAutoComplete');
+    spyOn(autocomplete, 'empty');
 
+    // WHEN
     var result = this.$input.jqAutoComplete().empty();
-    expect(ac.empty).toHaveBeenCalled();
+
+    // THEN
+    expect(autocomplete.empty).toHaveBeenCalled();
     expect(result).toBe(this.$input);
   });
 
   it("should set item on autocomplete", function() {
+    // GIVEN
     this.$input.jqAutoComplete();
-    var ac = this.$input.data('jqAutoComplete');
-    spyOn(ac, 'val');
+    var autocomplete = this.$input.data('jqAutoComplete');
+    spyOn(autocomplete, 'val');
 
+    // WHEN
     var result = this.$input.jqAutoComplete().val('foo');
-    expect(ac.val).toHaveBeenCalledWith('foo');
+
+    // THEN
+    expect(autocomplete.val).toHaveBeenCalledWith('foo');
     expect(result).toBe(this.$input);
   });
 
   it("should get selected item", function() {
+    // GIVEN
     this.$input.jqAutoComplete();
-    var ac = this.$input.data('jqAutoComplete');
-    ac.item = 'foo';
+    var autocomplete = this.$input.data('jqAutoComplete');
+    autocomplete.item = 'foo';
 
+    // WHEN
     var result = this.$input.jqAutoComplete().val();
+
+    // THEN
     expect(result).toBe('foo');
   });
 
   it("should call clearCache function", function() {
+    // GIVEN
     this.$input.jqAutoComplete();
-    var ac = this.$input.data('jqAutoComplete');
-    spyOn(ac, 'clearCache');
+    var autocomplete = this.$input.data('jqAutoComplete');
+    spyOn(autocomplete, 'clearCache');
 
+    // WHEN
     var result = this.$input.jqAutoComplete().clearCache();
-    expect(ac.clearCache).toHaveBeenCalled();
+
+    // THEN
+    expect(autocomplete.clearCache).toHaveBeenCalled();
     expect(result).toBe(this.$input);
   });
 
   it("should hide autocomplete", function() {
-    var autocomplete = this.$input.jqAutoComplete();
+    // GIVEN
+    var $autocomplete = this.$input.jqAutoComplete();
 
-    var ac = this.$input.data('jqAutoComplete');
-    spyOn(ac, 'hide');
+    var autocomplete = this.$input.data('jqAutoComplete');
+    spyOn(autocomplete, 'hide');
 
-    autocomplete.hide();
-    expect(ac.hide).toHaveBeenCalled();
+    // WHEN
+    $autocomplete.hide();
+
+    // THEN
+    expect(autocomplete.hide).toHaveBeenCalled();
   });
 
   it("should show autocomplete", function() {
-    var autocomplete = this.$input.jqAutoComplete();
+    // GIVEN
+    var $autocomplete = this.$input.jqAutoComplete();
 
-    var datas = ['foo', 'bar'];
-    var ac = this.$input.data('jqAutoComplete');
-    spyOn(ac, 'show');
+    var data = ['foo', 'bar'];
+    var autocomplete = this.$input.data('jqAutoComplete');
+    spyOn(autocomplete, 'show');
 
-    autocomplete.show(datas);
-    expect(ac.show).toHaveBeenCalledWith(datas);
+    // WHEN
+    $autocomplete.show(data);
+
+    // THEN
+    expect(autocomplete.show).toHaveBeenCalledWith(data);
   });
 
   describe("Check Behavior of AutoComplete", function() {
@@ -314,7 +360,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       this.cssActive = 'jq-autocomplete-item-active';
     });
 
-    it("should bind user events", function() {
+    it("should bind user events on initialization", function() {
       expect(this.autocomplete.$input.on).toHaveBeenCalledWith('keyup.jqauto', jasmine.any(Function));
       expect(this.autocomplete.$input.on).toHaveBeenCalledWith('keydown.jqauto', jasmine.any(Function));
       expect(this.autocomplete.$input.on).toHaveBeenCalledWith('focusin.jqauto', jasmine.any(Function));
@@ -325,24 +371,32 @@ describe("jQuery AutoComplete Test Suite", function() {
     });
 
     it("should unbind user events", function() {
+      // GIVEN
       spyOn(this.autocomplete, 'unbindForm').andCallThrough();
       this.autocomplete.$form = undefined;
       this.autocomplete.$cancel = undefined;
       this.autocomplete.$link = undefined;
 
+      // WHEN
       this.autocomplete.unbind();
+
+      // THEN
       expect(this.autocomplete.$input.off).toHaveBeenCalledWith('.jqauto');
       expect(this.autocomplete.$ul.off).toHaveBeenCalledWith('.jqauto');
       expect(this.autocomplete.unbindForm).toHaveBeenCalled();
     });
 
     it("should unbind user events and unbind form", function() {
+      // GIVEN
       spyOn(this.autocomplete, 'unbindForm').andCallThrough();
       this.autocomplete.$form = $('<form></form>');
       this.autocomplete.$cancel = $('<button></button>');
       this.autocomplete.$link = $('<a href="#"/>');
 
+      // WHEN
       this.autocomplete.unbind();
+
+      // THEN
       expect(this.autocomplete.$input.off).toHaveBeenCalledWith('.jqauto');
       expect(this.autocomplete.$ul.off).toHaveBeenCalledWith('.jqauto');
 
@@ -353,6 +407,7 @@ describe("jQuery AutoComplete Test Suite", function() {
     });
 
     it("should destroy autocomplete", function() {
+      // GIVEN
       spyOn(this.autocomplete, 'unbind');
       spyOn(this.autocomplete.opts, 'onDestroyed');
 
@@ -363,8 +418,10 @@ describe("jQuery AutoComplete Test Suite", function() {
       this.autocomplete.item = 'foo';
       this.autocomplete.idx = -1;
 
+      // WHEN
       this.autocomplete.destroy();
 
+      // THEN
       expect(unbind).toHaveBeenCalled();
       expect(onDestroyed).toHaveBeenCalled();
       expect(this.autocomplete.results).toBe(null);
@@ -373,6 +430,7 @@ describe("jQuery AutoComplete Test Suite", function() {
     });
 
     it("should clear timer and xhr when autocomplete is destroyed", function() {
+      // GIVEN
       spyOn(this.autocomplete, 'unbind');
       spyOn(window, 'clearTimeout');
 
@@ -386,29 +444,35 @@ describe("jQuery AutoComplete Test Suite", function() {
       this.autocomplete.item = 'foo';
       this.autocomplete.idx = -1;
 
+      // WHEN
       this.autocomplete.destroy();
 
+      // THEN
       expect(window.clearTimeout).toHaveBeenCalledWith(timer);
       expect(xhr.abort).toHaveBeenCalled();
     });
 
     it("should clear results and hide results list", function() {
+      // GIVEN
       spyOn(this.autocomplete, 'resetForm').andCallThrough();
       spyOn(this.autocomplete.opts, 'onHidden').andCallThrough();
 
-      this.autocomplete.idx = 0;
-
-      this.autocomplete.results = [
+      var results = [
         { id: 1, label: 'foo' },
         { id: 2, label: 'bar' }
       ];
 
+      this.autocomplete.idx = 0;
+      this.autocomplete.results = results;
       this.autocomplete.item = this.autocomplete.results[0];
 
       var fn = jasmine.createSpy('fn');
       this.autocomplete.opts.unSelect = fn;
 
+      // WHEN
       this.autocomplete.clear();
+
+      // THEN
       expect(this.autocomplete.resetForm).not.toHaveBeenCalled();
       expect(this.autocomplete.opts.onHidden).toHaveBeenCalled();
 
@@ -426,20 +490,24 @@ describe("jQuery AutoComplete Test Suite", function() {
     });
 
     it("should clear results and hide results list and not call callback if item is was not selected", function() {
+      // GIVEN
       spyOn(this.autocomplete.opts, 'onHidden').andCallThrough();
 
-      this.autocomplete.idx = 0;
-
-      this.autocomplete.results = [
+      var results = [
         { id: 1, label: 'foo' },
         { id: 2, label: 'bar' }
       ];
 
+      this.autocomplete.idx = 0;
+      this.autocomplete.results = results;
+
       var fn = jasmine.createSpy('fn');
       this.autocomplete.opts.unSelect = fn;
 
+      // WHEN
       this.autocomplete.clear();
 
+      // THEN
       expect(this.autocomplete.opts.onHidden).toHaveBeenCalled();
       expect(this.autocomplete.$input.val).not.toHaveBeenCalled();
 
@@ -454,6 +522,7 @@ describe("jQuery AutoComplete Test Suite", function() {
     });
 
     it("should clear results, hide results list and clear input value", function() {
+      // GIVEN
       spyOn(this.autocomplete, 'resetForm').andCallThrough();
       spyOn(this.autocomplete.opts, 'onHidden').andCallThrough();
 
@@ -461,7 +530,10 @@ describe("jQuery AutoComplete Test Suite", function() {
       this.autocomplete.results = this.results;
       this.autocomplete.item = this.results[0];
 
+      // WHEN
       this.autocomplete.empty();
+
+      // THEN
       expect(this.autocomplete.resetForm).toHaveBeenCalled();
       expect(this.autocomplete.opts.onHidden).toHaveBeenCalled();
       expect(this.autocomplete.$input.val).toHaveBeenCalledWith('');
@@ -490,22 +562,35 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should hide creation form if form is defined", function() {
+        // GIVEN
         spyOn(this.autocomplete, '$hide').andCallThrough();
+
+        // WHEN
         this.autocomplete.hide();
+
+        // THEN
         expect(this.autocomplete.$hide).toHaveBeenCalled();
       });
 
       it("should $hide creation form if form is defined", function() {
+        // GIVEN
         spyOn(this.autocomplete, 'hideCreationForm').andCallThrough();
+
+        // WHEN
         this.autocomplete.$hide();
+
+        // THEN
         expect(this.autocomplete.hideCreationForm).toHaveBeenCalled();
       });
 
       it("should hide creation form", function() {
+        // GIVEN
         this.autocomplete.$creation = true;
 
+        // WHEN
         this.autocomplete.hideCreationForm();
 
+        // THEN
         expect(this.autocomplete.$creation).toBe(false);
         expect(this.autocomplete.$form.hide).toHaveBeenCalled();
         expect(this.autocomplete.$ul.show).toHaveBeenCalled();
@@ -514,10 +599,13 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should not hide creation form if form was not visible", function() {
+        // GIVEN
         this.autocomplete.$creation = false;
 
+        // WHEN
         this.autocomplete.hideCreationForm();
 
+        // THEN
         expect(this.autocomplete.$creation).toBe(false);
         expect(this.autocomplete.$form.hide).not.toHaveBeenCalled();
         expect(this.autocomplete.$ul.show).not.toHaveBeenCalled();
@@ -526,14 +614,17 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should show creation form", function() {
+        // GIVEN
         var $input = jasmine.createSpyObj('$input', ['focus', 'val']);
         $input.val.andReturn($input);
         $input.focus.andReturn($input);
 
         this.autocomplete.$form.eq.andReturn($input);
 
+        // WHEN
         this.autocomplete.showCreationForm();
 
+        // THEN
         expect(this.autocomplete.$creation).toBe(true);
         expect(this.autocomplete.$ul.hide).toHaveBeenCalledWith();
         expect(this.autocomplete.$form.show).toHaveBeenCalled();
@@ -544,37 +635,40 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should create new item", function() {
+        // GIVEN
         this.autocomplete.$creation = true;
         this.autocomplete.opts.saveMethod = 'POST';
 
-        spyOn(this.autocomplete.$form, 'serializeArray').andReturn([
-          {
-            name: 'name',
-            value: 'foo'
-          },
-          {
-            name: 'bar',
-            value: 'quix'
-          }
-        ]);
+        var item1 = {
+          name: 'name',
+          value: 'foo'
+        };
 
+        var item2 = {
+          name: 'bar',
+          value: 'quix'
+        };
+
+        spyOn(this.autocomplete.$form, 'serializeArray').andReturn([item1, item2]);
         spyOn(this.autocomplete.opts, 'onSaved');
         spyOn(this.autocomplete.opts, 'isValid').andReturn(true);
 
+        // WHEN
         this.autocomplete.create();
 
-        var datas = {
+        // THEN
+        var data = {
           name: 'foo',
           bar: 'quix'
         };
 
         expect(this.autocomplete.$saving).toBe(true);
-        expect(this.autocomplete.opts.isValid).toHaveBeenCalledWith(datas, this.autocomplete.$form);
-        expect(this.autocomplete.opts.onSaved).toHaveBeenCalledWith(datas);
+        expect(this.autocomplete.opts.isValid).toHaveBeenCalledWith(data, this.autocomplete.$form);
+        expect(this.autocomplete.opts.onSaved).toHaveBeenCalledWith(data);
         expect($.ajax).toHaveBeenCalledWith({
           url: '/save',
           type: 'POST',
-          data: datas,
+          data: data,
           dataType: 'json',
           contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
         });
@@ -606,6 +700,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should create new item using json content type", function() {
+        // GIVEN
         window.JSON = jasmine.createSpyObj('JSON', ['stringify']);
         window.JSON.stringify.andCallFake(function() {
           return '{"name": "foo", "bar": "quix"}';
@@ -615,22 +710,24 @@ describe("jQuery AutoComplete Test Suite", function() {
         this.autocomplete.opts.saveMethod = 'POST';
         this.autocomplete.opts.saveContentType = 'application/json';
 
-        spyOn(this.autocomplete.$form, 'serializeArray').andReturn([
-          {
-            name: 'name',
-            value: 'foo'
-          },
-          {
-            name: 'bar',
-            value: 'quix'
-          }
-        ]);
+        var item1 = {
+          name: 'name',
+          value: 'foo'
+        };
 
+        var item2 = {
+          name: 'bar',
+          value: 'quix'
+        };
+
+        spyOn(this.autocomplete.$form, 'serializeArray').andReturn([item1, item2]);
         spyOn(this.autocomplete.opts, 'onSaved');
         spyOn(this.autocomplete.opts, 'isValid').andReturn(true);
 
+        // WHEN
         this.autocomplete.create();
 
+        // THEN
         var datas = {
           name: 'foo',
           bar: 'quix'
@@ -674,10 +771,14 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should reset form", function() {
+        // GIVEN
         var $items = jasmine.createSpyObj('$items', ['each']);
         spyOn($.fn, 'find').andReturn($items);
 
+        // WHEN
         this.autocomplete.resetForm();
+
+        // THEN
         expect(this.autocomplete.$form.find).toHaveBeenCalled();
         expect($items.each).toHaveBeenCalledWith(jasmine.any(Function));
 
@@ -688,9 +789,14 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should not reset form if form is not set", function() {
+        // GIVEN
         spyOn($.fn, 'find')
         this.autocomplete.$form = undefined;
+
+        // WHEN
         this.autocomplete.resetForm();
+
+        // THEN
         expect($.fn.find).not.toHaveBeenCalled();
       });
     });
@@ -719,12 +825,15 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should save last position", function() {
+        // GIVEN
         this.autocomplete.left = 50;
         this.autocomplete.top = 30;
         this.autocomplete.width = 10;
 
+        // WHEN
         this.autocomplete.positionResult();
 
+        // THEN
         expect(this.autocomplete.$input.position).toHaveBeenCalled();
 
         expect(this.autocomplete.left).toBe(100);
@@ -740,27 +849,30 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should not call css twice if position does not change", function() {
+        // WHEN
         this.autocomplete.positionResult();
 
+        // THEN
         expect(this.autocomplete.$input.position).toHaveBeenCalled();
-
         expect(this.autocomplete.left).toBe(100);
         expect(this.autocomplete.top).toBe(70);
         expect(this.autocomplete.width).toBe(30);
-
         expect(this.autocomplete.$ul.css).not.toHaveBeenCalledWith();
       });
     });
 
     describe("Check Selection Functions", function() {
 
-      it("should set a string value", function () {
+      it("should set a string value", function() {
+        // GIVEN
         var fn = jasmine.createSpy('fn');
         this.autocomplete.opts.select = fn;
-
         this.autocomplete.idx = 0;
+
+        // WHEN
         this.autocomplete.val('foo');
 
+        // THEN
         expect(this.autocomplete.item).toBe('foo');
         expect(this.autocomplete.filter).toBe('foo');
         expect(this.autocomplete.$input.val).toHaveBeenCalledWith('foo');
@@ -769,18 +881,21 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect(this.autocomplete.idx).toBe(-1);
       });
 
-      it("should set an object value", function () {
+      it("should set an object value", function() {
+        // GIVEN
         var obj = {
           id: 1,
           label: 'foo'
         };
 
         var fn = jasmine.createSpy('fn');
-
         this.autocomplete.opts.label = 'label';
         this.autocomplete.opts.select = fn;
+
+        // WHEN
         this.autocomplete.val(obj);
 
+        // THEN
         expect(this.autocomplete.item).toBe(obj);
         expect(this.autocomplete.filter).toBe('foo');
         expect(this.autocomplete.$input.val).toHaveBeenCalledWith('foo');
@@ -788,24 +903,39 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect(fn).toHaveBeenCalledWith(obj);
       });
 
-      it("should select item at given index", function () {
+      it("should select item at given index", function() {
+        // GIVEN
+        this.autocomplete.results = ['foo', 'bar', 'quix'];
         spyOn(this.autocomplete, 'val');
 
-        this.autocomplete.results = ['foo', 'bar', 'quix'];
+        // WHEN
         this.autocomplete.select(0);
 
+        // THEN
         expect(this.autocomplete.val).toHaveBeenCalledWith('foo');
       });
 
-      it("should not select if index is outside of range", function () {
+      it("should not select if index is lower than zero", function() {
+        // GIVEN
+        this.autocomplete.results = ['foo', 'bar', 'quix'];
         spyOn(this.autocomplete, 'val');
 
-        this.autocomplete.results = ['foo', 'bar', 'quix'];
-
+        // WHEN
         this.autocomplete.select(-1);
-        expect(this.autocomplete.val).not.toHaveBeenCalled();
 
+        // THEN
+        expect(this.autocomplete.val).not.toHaveBeenCalled();
+      });
+
+      it("should not select if index is greater than max available item", function() {
+        // GIVEN
+        this.autocomplete.results = ['foo', 'bar', 'quix'];
+        spyOn(this.autocomplete, 'val');
+
+        // WHEN
         this.autocomplete.select(3);
+
+        // THEN
         expect(this.autocomplete.val).not.toHaveBeenCalled();
       });
     });
@@ -813,17 +943,20 @@ describe("jQuery AutoComplete Test Suite", function() {
     describe("Check Show Function", function() {
       beforeEach(function() {
         spyOn(this.autocomplete, 'positionResult').andCallThrough();
-
         spyOn(this.autocomplete.opts, 'onShown').andCallThrough();
       });
 
-      it("should display some strings", function () {
-        var datas = ['foo', 'bar', 'quix'];
-        this.autocomplete.show(datas);
+      it("should display some strings", function() {
+        // GIVEN
+        var data = ['foo', 'bar', 'quix'];
 
+        // WHEN
+        this.autocomplete.show(data);
+
+        // THEN
         expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
-        expect(this.autocomplete.results).toEqual(datas);
+        expect(this.autocomplete.results).toEqual(data);
         expect(this.autocomplete.$ul.hide).toHaveBeenCalled();
         expect(this.autocomplete.$ul.empty).toHaveBeenCalled();
         expect(this.autocomplete.$ul.show).toHaveBeenCalled();
@@ -852,13 +985,17 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect($li3.html()).toBe('quix');
       });
 
-      it("should display some numbers", function () {
-        var datas = [1, 2, 3];
-        this.autocomplete.show(datas);
+      it("should display some numbers", function() {
+        // GIVEN
+        var data = [1, 2, 3];
 
+        // WHEN
+        this.autocomplete.show(data);
+
+        // THEN
         expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
-        expect(this.autocomplete.results).toEqual(datas);
+        expect(this.autocomplete.results).toEqual(data);
         expect(this.autocomplete.$ul.empty).toHaveBeenCalled();
 
         var $lis = this.autocomplete.$ul.find('li');
@@ -884,18 +1021,23 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect($li3.html()).toBe('3');
       });
 
-      it("should display object with a custom renderer", function () {
-        var datas = ['foo', 'bar', 'quix'];
-        var fn = jasmine.createSpy('label').andCallFake(function (obj) {
+      it("should display object with a custom renderer", function() {
+        // GIVEN
+        var data = ['foo', 'bar', 'quix'];
+
+        var fn = jasmine.createSpy('label').andCallFake(function(obj) {
           return obj + ' called';
         });
+
         this.autocomplete.opts.label = fn;
 
-        this.autocomplete.show(datas);
+        // WHEN
+        this.autocomplete.show(data);
 
+        // THEN
         expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
-        expect(this.autocomplete.results).toEqual(datas);
+        expect(this.autocomplete.results).toEqual(data);
         expect(this.autocomplete.$ul.empty).toHaveBeenCalled();
 
         expect(fn).toHaveBeenCalledWith('foo');
@@ -925,8 +1067,9 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect($li3.html()).toBe('quix called');
       });
 
-      it("should display object with simple attribute", function () {
-        var datas = [
+      it("should display object with simple attribute", function() {
+        // GIVEN
+        var data = [
           { id: 1, text: 'foo' },
           { id: 2, text: 'bar' },
           { id: 3, text: 'quix'}
@@ -934,11 +1077,13 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         this.autocomplete.opts.label = 'text';
 
-        this.autocomplete.show(datas);
+        // WHEN
+        this.autocomplete.show(data);
 
+        // THEN
         expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
-        expect(this.autocomplete.results).toEqual(datas);
+        expect(this.autocomplete.results).toEqual(data);
         expect(this.autocomplete.$ul.empty).toHaveBeenCalled();
 
         var $lis = this.autocomplete.$ul.find('li');
@@ -964,8 +1109,9 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect($li3.html()).toBe('quix');
       });
 
-      it("should display object with nested attribute", function () {
-        var datas = [
+      it("should display object with nested attribute", function() {
+        // GIVEN
+        var data = [
           { id: 1, value: { text: 'foo', text2: 'foo2' } },
           { id: 2, value: { text: 'bar', text2: 'bar2' } },
           { id: 3, value: { text: 'quix', text2: 'quix2' } }
@@ -973,11 +1119,13 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         this.autocomplete.opts.label = 'value.text';
 
-        this.autocomplete.show(datas);
+        // WHEN
+        this.autocomplete.show(data);
 
+        // THEN
         expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
-        expect(this.autocomplete.results).toEqual(datas);
+        expect(this.autocomplete.results).toEqual(data);
         expect(this.autocomplete.$ul.empty).toHaveBeenCalled();
 
         var $lis = this.autocomplete.$ul.find('li');
@@ -1003,13 +1151,17 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect($li3.html()).toBe('quix');
       });
 
-      it("should not display null or undefined values", function () {
-        var datas = [ 'foo', null, undefined ];
-        this.autocomplete.show(datas);
+      it("should not display null or undefined values", function() {
+        // GIVEN
+        var data = [ 'foo', null, undefined ];
 
+        // WHEN
+        this.autocomplete.show(data);
+
+        // THEN
         expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
-        expect(this.autocomplete.results).toEqual(datas);
+        expect(this.autocomplete.results).toEqual(data);
         expect(this.autocomplete.$ul.empty).toHaveBeenCalled();
 
         var $lis = this.autocomplete.$ul.find('li');
@@ -1049,9 +1201,13 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should not fetch if filter does not change", function() {
+        // GIVEN
         this.autocomplete.filter = 'foo';
+
+        // WHEN
         this.autocomplete.fetch('foo');
 
+        // THEN
         expect(window.setTimeout).not.toHaveBeenCalled();
         expect($.ajax).not.toHaveBeenCalled();
         expect(this.autocomplete.$ul.show).toHaveBeenCalled();
@@ -1059,10 +1215,14 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should not fetch and not display result if filter does not change and item is already selected", function() {
+        // GIVEN
         this.autocomplete.item = 'foo';
         this.autocomplete.filter = 'foo';
+
+        // WHEN
         this.autocomplete.fetch('foo');
 
+        // THEN
         expect(window.setTimeout).not.toHaveBeenCalled();
         expect($.ajax).not.toHaveBeenCalled();
         expect(this.autocomplete.$ul.show).not.toHaveBeenCalled();
@@ -1070,14 +1230,17 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should fetch results", function() {
+        // GIVEN
         var fn = jasmine.createSpy('fn');
         this.autocomplete.opts.unSelect = fn;
 
         // Disable cache
         this.autocomplete.opts.cache = false;
 
+        // WHEN
         this.autocomplete.fetch('foo');
 
+        // THEN
         expect(fn).not.toHaveBeenCalled();
         expect(window.clearTimeout).not.toHaveBeenCalled();
         expect(window.setTimeout).toHaveBeenCalledWith(jasmine.any(Function), 200);
@@ -1109,14 +1272,16 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should fetch results and store in cache if cache is enable", function() {
-        var fn = jasmine.createSpy('fn');
-        this.autocomplete.opts.unSelect = fn;
+        // GIVEN
+        this.autocomplete.opts.unSelect = jasmine.createSpy('fn');
 
         // Enable cache
         this.autocomplete.opts.cache = true;
 
+        // WHEN
         this.autocomplete.fetch('foo');
 
+        // THEN
         window.setTimeout.argsForCall[0][0]();
         expect($.ajax).toHaveBeenCalledWith({
           url: '/search',
@@ -1140,59 +1305,74 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should not call fetch if cache is enable and result has been fetched", function() {
-        var fn = jasmine.createSpy('fn');
-        this.autocomplete.opts.unSelect = fn;
+        // GIVEN
+        this.autocomplete.opts.unSelect = jasmine.createSpy('fn');
 
         // Enable cache
         this.autocomplete.opts.cache = true;
         this.autocomplete.caches['foo'] = ['foo'];
 
+        // WHEN
         this.autocomplete.fetch('foo');
 
+        // THEN
         expect(window.setTimeout).not.toHaveBeenCalled();
         expect(this.autocomplete.show).toHaveBeenCalledWith(['foo']);
         expect(this.autocomplete.caches['foo']).toEqual(['foo']);
       });
 
       it("should not call fetch if cache is enable and result has been fetched and is case-insensitive", function() {
-        var fn = jasmine.createSpy('fn');
-        this.autocomplete.opts.unSelect = fn;
+        // GIVEN
+        this.autocomplete.opts.unSelect = jasmine.createSpy('fn');
 
         // Enable cache
         this.autocomplete.opts.cache = true;
         this.autocomplete.caches['foo'] = ['foo'];
 
+        // WHEN
         this.autocomplete.fetch('FOO');
 
+        // THEN
         expect(window.setTimeout).not.toHaveBeenCalled();
         expect(this.autocomplete.show).toHaveBeenCalledWith(['foo']);
         expect(this.autocomplete.caches['foo']).toEqual(['foo']);
       });
 
-       it("should clear cache", function() {
+      it("should clear cache", function() {
+        // GIVEN
         // Enable cache
         this.autocomplete.opts.cache = true;
         this.autocomplete.caches['foo'] = ['foo'];
 
+        // WHEN
         this.autocomplete.clearCache();
+
+        // THEN
         expect(this.autocomplete.caches).toEqual({});
       });
 
       it("should fetch results and call callback if an item was selected", function() {
+        // GIVEN
         var fn = jasmine.createSpy('fn');
         this.autocomplete.opts.unSelect = fn;
         this.autocomplete.item = 'bar';
 
+        // WHEN
         this.autocomplete.fetch('foo');
 
+        // THEN
         expect(fn).toHaveBeenCalled();
         expect(window.setTimeout).toHaveBeenCalledWith(jasmine.any(Function), 200);
       });
 
       it("should abort current timeout if a new is coming", function() {
+        // GIVEN
         this.autocomplete.timer = this.timer;
+
+        // WHEN
         this.autocomplete.fetch('foo');
 
+        // THEN
         expect(window.clearTimeout).toHaveBeenCalledWith(this.timer);
         expect(this.xhr.abort).not.toHaveBeenCalled();
 
@@ -1201,10 +1381,14 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should abort current timeout and current request if a new is coming", function() {
+        // GIVEN
         this.autocomplete.xhr = this.xhr;
         this.autocomplete.timer = this.timer;
+
+        // WHEN
         this.autocomplete.fetch('foo');
 
+        // THEN
         expect(window.clearTimeout).toHaveBeenCalledWith(this.timer);
         expect(this.xhr.abort).toHaveBeenCalled();
 
@@ -1213,9 +1397,13 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should fetch results without limit if limit is null", function() {
+        // GIVEN
         this.autocomplete.opts.limit = null;
+
+        // WHEN
         this.autocomplete.fetch('foo');
 
+        // THEN
         window.setTimeout.argsForCall[0][0]();
         expect($.ajax).toHaveBeenCalledWith({
           url: '/search',
@@ -1228,12 +1416,15 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should append some parameters to request if datas are given in options as object", function() {
+        // GIVEN
         this.autocomplete.opts.datas = {
           foo: 'bar'
         };
 
+        // WHEN
         this.autocomplete.fetch('foo');
 
+        // THEN
         window.setTimeout.argsForCall[0][0]();
         expect($.ajax).toHaveBeenCalledWith({
           url: '/search',
@@ -1248,14 +1439,17 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should append some parameters to request if datas are given in options as function", function() {
+        // GIVEN
         this.autocomplete.opts.datas = function() {
           return {
             foo: 'bar'
           };
         };
 
+        // WHEN
         this.autocomplete.fetch('foo');
 
+        // THEN
         window.setTimeout.argsForCall[0][0]();
         expect($.ajax).toHaveBeenCalledWith({
           url: '/search',
@@ -1282,8 +1476,10 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should highlight first item if index 0 is given", function() {
+        // WHEN
         this.autocomplete.highlight(0);
 
+        // THEN
         expect(this.autocomplete.idx).toBe(0);
         expect(this.autocomplete.item).toBeUndefined();
         expect(this.$li1.removeClass).toHaveBeenCalledWith(this.cssActive);
@@ -1293,8 +1489,10 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should highlight second item if index 1 is given", function() {
+        // WHEN
         this.autocomplete.highlight(1);
 
+        // THEN
         expect(this.autocomplete.idx).toBe(1);
         expect(this.autocomplete.item).toBeUndefined();
         expect(this.$li1.removeClass).toHaveBeenCalledWith(this.cssActive);
@@ -1304,8 +1502,10 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should highlight second item if index 2 is given", function() {
+        // WHEN
         this.autocomplete.highlight(2);
 
+        // THEN
         expect(this.autocomplete.idx).toBe(2);
         expect(this.autocomplete.item).toBeUndefined();
         expect(this.$li1.removeClass).toHaveBeenCalledWith(this.cssActive);
@@ -1315,8 +1515,10 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should highlight last item if index -1 is given", function() {
+        // WHEN
         this.autocomplete.highlight(-1);
 
+        // THEN
         expect(this.autocomplete.idx).toBe(2);
         expect(this.autocomplete.item).toBeUndefined();
         expect(this.$li1.removeClass).toHaveBeenCalledWith(this.cssActive);
@@ -1326,8 +1528,10 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should highlight last item if index -2 is given", function() {
+        // WHEN
         this.autocomplete.highlight(-2);
 
+        // THEN
         expect(this.autocomplete.idx).toBe(2);
         expect(this.autocomplete.item).toBeUndefined();
         expect(this.$li1.removeClass).toHaveBeenCalledWith(this.cssActive);
@@ -1337,8 +1541,10 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should highlight first item if index 3 is given", function() {
+        // WHEN
         this.autocomplete.highlight(3);
 
+        // THEN
         expect(this.autocomplete.idx).toBe(0);
         expect(this.autocomplete.item).toBeUndefined();
         expect(this.$li1.removeClass).toHaveBeenCalledWith(this.cssActive);
@@ -1376,11 +1582,15 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should remove active item style if mouse enter in list of results", function() {
+        // GIVEN
         var $li1 = $('<li class="jq-autocomplete-item-active">foo</li>');
         var $li2 = $('<li>bar</li>');
         this.autocomplete.$ul.append($li1).append($li2);
 
+        // WHEN
         this.autocomplete.$ul.trigger(this.mouseenter);
+
+        // THEN
         expect($li1.removeClass).toHaveBeenCalledWith('jq-autocomplete-item-active');
         expect($li2.removeClass).toHaveBeenCalledWith('jq-autocomplete-item-active');
 
@@ -1389,22 +1599,31 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should select item if user click on it", function() {
+        // GIVEN
         var $li1 = $('<li data-idx="0" class="jq-autocomplete-item-active">foo</li>');
         var $li2 = $('<li data-idx="1">bar</li>');
         this.autocomplete.$ul.append($li1).append($li2);
 
+        // WHEN
         $li1.trigger(this.click);
+
+        // THEN
         expect(this.autocomplete.select).toHaveBeenCalledWith(0);
         expect(this.autocomplete.$input.focus).toHaveBeenCalled();
       });
 
       it("should set focus if enter key is pressed", function() {
+        // GIVEN
         this.keydownEvent.keyCode = 13;
         this.autocomplete.idx = 0;
         this.autocomplete.results = [
           { id: 1 }
         ];
+
+        // WHEN
         this.autocomplete.$input.trigger(this.keydownEvent);
+
+        // THEN
         expect(this.autocomplete.$input.focus).toHaveBeenCalled();
         expect(this.keydownEvent.preventDefault).toHaveBeenCalled();
         expect(this.keydownEvent.stopPropagation).toHaveBeenCalled();
@@ -1412,9 +1631,14 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should not set focus if enter key is pressed", function() {
+        // GIVEN
         this.keydownEvent.keyCode = 13;
         this.autocomplete.idx = -1;
+
+        // WHEN
         this.autocomplete.$input.trigger(this.keydownEvent);
+
+        // THEN
         expect(this.autocomplete.$input.focus).not.toHaveBeenCalled();
         expect(this.keydownEvent.preventDefault).not.toHaveBeenCalled();
         expect(this.keydownEvent.stopPropagation).not.toHaveBeenCalled();
@@ -1422,39 +1646,54 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should show last results on focus", function() {
+        // GIVEN
         this.autocomplete.results = ['foo', 'bar', 'quix'];
+
+        // WHEN
         this.autocomplete.$input.trigger(this.focusin);
 
+        // THEN
         expect(this.autocomplete.focus).toBe(true);
         expect(this.autocomplete.$ul.show).toHaveBeenCalled();
         expect(this.autocomplete.positionResult).toHaveBeenCalled();
       });
 
       it("should not show last results on focus if an item is already selected", function() {
+        // GIVEN
         this.autocomplete.results = ['foo', 'bar', 'quix'];
         this.autocomplete.item = 'foo';
+
+        // WHEN
         this.autocomplete.$input.trigger(this.focusin);
 
+        // THEN
         expect(this.autocomplete.focus).toBe(true);
         expect(this.autocomplete.$ul.show).not.toHaveBeenCalled();
         expect(this.autocomplete.positionResult).not.toHaveBeenCalled();
       });
 
       it("should not show last results if no results are known", function() {
+        // GIVEN
         this.autocomplete.results = [];
+
+        // WHEN
         this.autocomplete.$input.trigger(this.focusin);
 
+        // THEN
         expect(this.autocomplete.focus).toBe(true);
         expect(this.autocomplete.$ul.show).not.toHaveBeenCalled();
         expect(this.autocomplete.positionResult).not.toHaveBeenCalled();
       });
 
       it("hide results on focusout", function() {
+        // GIVEN
         spyOn(this.autocomplete.opts, 'focusout').andCallThrough();
-
         this.autocomplete.$input.val('foo');
+
+        // WHEN
         this.autocomplete.$input.trigger(this.focusout);
 
+        // THEN
         expect(this.autocomplete.focus).toBe(false);
         expect(this.autocomplete.$ul.hide).not.toHaveBeenCalled();
         expect(this.autocomplete.positionResult).not.toHaveBeenCalled();
@@ -1469,42 +1708,54 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should fetch results if filter is long enough", function() {
+        // GIVEN
+        this.keyupEvent.keyCode = 25;
         this.autocomplete.$input.val('foo');
         this.autocomplete.opts.minSize = 2;
 
-        this.keyupEvent.keyCode = 25;
+        // WHEN
         this.autocomplete.$input.trigger(this.keyupEvent);
 
+        // THEN
         expect(this.autocomplete.fetch).toHaveBeenCalledWith('foo');
       });
 
       it("should fetch results if filter is equal to min size", function() {
+        // GIVEN
+        this.keyupEvent.keyCode = 25;
         this.autocomplete.$input.val('foo');
         this.autocomplete.opts.minSize = 3;
 
-        this.keyupEvent.keyCode = 25;
+        // WHEN
         this.autocomplete.$input.trigger(this.keyupEvent);
 
+        // THEN
         expect(this.autocomplete.fetch).toHaveBeenCalledWith('foo');
       });
 
       it("should trim filter and fetch", function() {
+        // GIVEN
+        this.keyupEvent.keyCode = 25;
         this.autocomplete.$input.val(' foo ');
         this.autocomplete.opts.minSize = 2;
 
-        this.keyupEvent.keyCode = 25;
+        // WHEN
         this.autocomplete.$input.trigger(this.keyupEvent);
 
+        // THEN
         expect(this.autocomplete.fetch).toHaveBeenCalledWith('foo');
       });
 
       it("should not fetch results if filter is too small", function() {
+        // GIVEN
+        this.keyupEvent.keyCode = 25;
         this.autocomplete.$input.val('foo');
         this.autocomplete.opts.minSize = 5;
 
-        this.keyupEvent.keyCode = 25;
+        // WHEN
         this.autocomplete.$input.trigger(this.keyupEvent);
 
+        // THEN
         expect(this.autocomplete.fetch).not.toHaveBeenCalled();
         expect(this.autocomplete.filter).toEqual('foo');
         expect(this.autocomplete.$ul.hide).toHaveBeenCalled();
@@ -1513,88 +1764,124 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
 
       it("should highlight first item if arrow down is pressed and current idx is -1", function() {
+        // GIVEN
         this.keydownEvent.keyCode = 40;
+
+        // WHEN
         this.autocomplete.$input.trigger(this.keydownEvent);
 
+        // THEN
         expect(this.keydownEvent.preventDefault).toHaveBeenCalled();
         expect(this.keydownEvent.stopPropagation).toHaveBeenCalled();
         expect(this.autocomplete.highlight).toHaveBeenCalledWith(0);
       });
 
       it("should highlight second item if arrow down is pressed and current idx is 0", function() {
+        // GIVEN
         this.keydownEvent.keyCode = 40;
         this.autocomplete.idx = 0;
+
+        // WHEN
         this.autocomplete.$input.trigger(this.keydownEvent);
 
+        // THEN
         expect(this.keydownEvent.preventDefault).toHaveBeenCalled();
         expect(this.keydownEvent.stopPropagation).toHaveBeenCalled();
         expect(this.autocomplete.highlight).toHaveBeenCalledWith(1);
       });
 
       it("should highlight third item if arrow down is pressed and current idx is 1", function() {
+        // GIVEN
         this.keydownEvent.keyCode = 40;
         this.autocomplete.idx = 1;
+
+        // WHEN
         this.autocomplete.$input.trigger(this.keydownEvent);
 
+        // THEN
         expect(this.keydownEvent.preventDefault).toHaveBeenCalled();
         expect(this.keydownEvent.stopPropagation).toHaveBeenCalled();
         expect(this.autocomplete.highlight).toHaveBeenCalledWith(2);
       });
 
       it("should highlight first item if arrow down is pressed and current idx is 2", function() {
+        // GIVEN
         this.keydownEvent.keyCode = 40;
         this.autocomplete.idx = 2;
+
+        // WHEN
         this.autocomplete.$input.trigger(this.keydownEvent);
 
+        // THEN
         expect(this.keydownEvent.preventDefault).toHaveBeenCalled();
         expect(this.keydownEvent.stopPropagation).toHaveBeenCalled();
         expect(this.autocomplete.highlight).toHaveBeenCalledWith(3);
       });
 
       it("should highlight last item if arrow up is pressed and current idx is -1", function() {
+        // GIVEN
         this.keydownEvent.keyCode = 38;
+
+        // WHEN
         this.autocomplete.$input.trigger(this.keydownEvent);
 
+        // THEN
         expect(this.keydownEvent.preventDefault).toHaveBeenCalled();
         expect(this.keydownEvent.stopPropagation).toHaveBeenCalled();
         expect(this.autocomplete.highlight).toHaveBeenCalledWith(-2);
       });
 
       it("should highlight second item if arrow up is pressed and current idx is 2", function() {
+        // GIVEN
         this.keydownEvent.keyCode = 38;
         this.autocomplete.idx = 2;
+
+        // WHEN
         this.autocomplete.$input.trigger(this.keydownEvent);
 
+        // THEN
         expect(this.keydownEvent.preventDefault).toHaveBeenCalled();
         expect(this.keydownEvent.stopPropagation).toHaveBeenCalled();
         expect(this.autocomplete.highlight).toHaveBeenCalledWith(1);
       });
 
       it("should highlight first item if arrow down is pressed and current idx is 1", function() {
+        // GIVEN
         this.keydownEvent.keyCode = 38;
         this.autocomplete.idx = 1;
+
+        // WHEN
         this.autocomplete.$input.trigger(this.keydownEvent);
 
+        // THEN
         expect(this.keydownEvent.preventDefault).toHaveBeenCalled();
         expect(this.keydownEvent.stopPropagation).toHaveBeenCalled();
         expect(this.autocomplete.highlight).toHaveBeenCalledWith(0);
       });
 
       it("should highlight last item if arrow down is pressed and current idx is 0", function() {
+        // GIVEN
         this.keydownEvent.keyCode = 38;
         this.autocomplete.idx = 0;
+
+        // WHEN
         this.autocomplete.$input.trigger(this.keydownEvent);
 
+        // THEN
         expect(this.keydownEvent.preventDefault).toHaveBeenCalled();
         expect(this.keydownEvent.stopPropagation).toHaveBeenCalled();
         expect(this.autocomplete.highlight).toHaveBeenCalledWith(-1);
       });
 
       it("should select current index with tab event", function() {
+        // GIVEN
         this.keydownEvent.keyCode = 9;
         this.autocomplete.idx = 0;
+
+        // WHEN
         this.autocomplete.$input.trigger(this.keydownEvent);
 
+        // THEN
         expect(this.keydownEvent.preventDefault).not.toHaveBeenCalled();
         expect(this.keydownEvent.stopPropagation).not.toHaveBeenCalled();
         expect(this.autocomplete.select).toHaveBeenCalledWith(0);
