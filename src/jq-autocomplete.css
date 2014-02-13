@@ -20,6 +20,9 @@
 .jq-autocomplete-create-form {
   text-align: center;
   margin: 0;
+
+  /* Default is not visible. */
+  display: none;
 }
 
 .jq-autocomplete-create-form label {
@@ -59,6 +62,7 @@
 }
 
 .jq-autocomplete-item {
+  color: #000;
   text-align: left;
   cursor: pointer;
   padding: 2px 1px;
