@@ -472,13 +472,15 @@
         $ul.on('click' + NAMESPACE, 'li', onClickItem);
 
         var destroy = function() {
-          that.destroy();
+          if (that.destroy) {
+            that.destroy();
+          }
           that = null;
           $input = null;
           $ul = null;
         };
 
-        $input.on('jqAutoCompleteRemoved ', destroy);
+        $input.on('jqAutoCompleteRemoved', destroy);
 
         that.bindForm();
       },
@@ -943,36 +945,39 @@
       destroy: function() {
         var that = this;
 
-        that.opts.onDestroyed.call(that);
-        that.unbind();
+        // Do not destroy plugin if it is already destroyed
+        // If opts is null, then plugin is destroyed
+        if (that.opts !== null) {
+          that.opts.onDestroyed.call(that);
+          that.unbind();
 
-        if (that.timer) {
-          clearTimeout(that.timer);
-        }
+          if (that.timer) {
+            clearTimeout(that.timer);
+          }
 
-        if (that.xhr) {
-          that.xhr.abort();
-        }
+          if (that.xhr) {
+            that.xhr.abort();
+          }
 
-        if (that.$link) {
-          that.$link.remove();
-        }
+          if (that.$link) {
+            that.$link.remove();
+          }
 
-        if (that.$cancel) {
-          that.$cancel.remove();
-        }
+          if (that.$cancel) {
+            that.$cancel.remove();
+          }
 
-        if (that.$form) {
-          that.$form.remove();
-        }
+          if (that.$form) {
+            that.$form.remove();
+          }
 
-        that.$ul.remove();
-        that.$results.remove();
+          that.$ul.remove();
+          that.$results.remove();
 
-        for (var i in that) {
-          if (that.hasOwnProperty(i)) {
-            console.log('destroy ' + i);
-            that[i] = null;
+          for (var i in that) {
+            if (that.hasOwnProperty(i)) {
+              that[i] = null;
+            }
           }
         }
       }

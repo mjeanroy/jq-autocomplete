@@ -1905,6 +1905,7 @@ describe("jQuery AutoComplete Test Suite", function() {
     describe("Check Destroy Events", function() {
       beforeEach(function() {
         spyOn(this.autocomplete, 'destroy');
+        spyOn(this.autocomplete, 'unbind');
       });
 
       it("should destroy plugin when input is removed from dom", function() {
@@ -1913,6 +1914,21 @@ describe("jQuery AutoComplete Test Suite", function() {
 
         // THEN
         expect(this.autocomplete.destroy).toHaveBeenCalled();
+      });
+
+      it("should not destroy plugin twice", function() {
+        // GIVEN
+        var unbind = this.autocomplete.unbind;
+        var $input = this.autocomplete.$input;
+        this.autocomplete.destroy.andCallThrough();
+
+        // WHEN
+        this.autocomplete.destroy();
+        $input.remove();
+
+        // THEN
+        expect(unbind).toHaveBeenCalled();
+        expect(unbind.callCount).toBe(1);
       });
     });
   });
