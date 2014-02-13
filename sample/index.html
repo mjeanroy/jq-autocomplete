@@ -3,7 +3,11 @@
 <head>
   <title>Sample jq-AutoComplete</title>
   <script type="text/javascript" src="jquery/jquery.js"></script>
-  <script type="text/javascript" src="jq-autocomplete.js"></script>
+
+  <script type="text/javascript">
+    // Set cache to zero (use to test memory leak)
+    $.expr.cacheLength = 1;
+  </script>
 
   <link rel="stylesheet" href="bootstrap.css/css/bootstrap.css"/>
   <link rel="stylesheet" href="jq-autocomplete.css">
@@ -17,13 +21,13 @@
 <body>
 
 <div>
-  Search for some awesome frameworks (js initialization) : <input id="js-initialization" type="text" />
+  Search for some awesome frameworks (js initialization) : <input id="js-initialization" type="text"/>
 </div>
 
 <div>My Choice is : <span id="js-choice"></span></div>
 
 <div>
-  Search for some awesome frameworks (html initialization) : <input id="html-initialization" type="text" data-url="/search" data-min-size="3" data-label="label" data-cache="true" />
+  Search for some awesome frameworks (html initialization) : <input id="html-initialization" type="text" data-url="/search" data-min-size="3" data-label="label" data-cache="true"/>
 </div>
 
 <form class="form-creation">
@@ -34,6 +38,10 @@
   <input id="input-framework-version" type="text" name="version" required="required"/>
 </form>
 
+<button id="btn-remove" type="button" class="btn btn-primary">Remove</button>
+
+<script type="text/javascript" src="jq-autocomplete.js"></script>
+
 <script type="text/javascript">
   var $choice = $('#js-choice');
 
@@ -43,15 +51,22 @@
     minSize: 3,
     label: 'label',
     $createForm: '.form-creation',
-    select: function (obj) {
-     $choice.html(obj.label);
+    select: function(obj) {
+      $choice.html(obj.label);
     },
-    unSelect: function () {
+    unSelect: function() {
       $choice.empty();
     }
   });
 
   $('#html-initialization').jqAutoComplete();
+
+  $('#btn-remove').on('click', function() {
+    $('#js-initialization').remove();
+
+    // Clear sizzle form cache (size of cache is one, so it will remove form entries)
+    $('button[type!="submit"]');
+  });
 </script>
 </body>
 </html>

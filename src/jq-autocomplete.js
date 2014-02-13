@@ -80,6 +80,11 @@
      */
     var TAB = 9;
 
+    /**
+     * Prefix added to every autocomplete classes.
+     * @type {string}
+     * @const
+     */
     var CSS_PREFIX = 'jq-autocomplete-';
 
     /**
@@ -169,7 +174,11 @@
       return value;
     };
 
-    /** Convert value to integer using radix 10. */
+    /**
+     * Convert value to integer using radix 10.
+     * @param {number|string} Value to convert.
+     * @return {number} Parsed number.
+     */
     var toInt = function(val) {
       return parseInt(val, 10);
     };
@@ -185,6 +194,16 @@
         return str.indexOf(start) === 0;
       } else {
         return str.startsWith(start);
+      }
+    };
+
+    // Add special event to destroy plugin before it is removed from the DOM
+    // Think about DOM Mutation Observer (DOMNodeRemoved event) if needed
+    $.event.special.jqAutoCompleteRemoved = {
+      remove: function(o) {
+        if (o.handler) {
+          o.handler();
+        }
       }
     };
 
@@ -268,7 +287,7 @@
         var cancelLabel = that.opts.cancel;
 
         if (submitLabel || cancelLabel) {
-          var $btnsWrappers = $('<div></div>')
+          var $buttonsWrappers = $('<div></div>')
             .addClass(FORM_BUTTONS_CLASS)
             .appendTo(that.$form);
 
@@ -280,7 +299,7 @@
               .addClass('btn')
               .addClass('btn-success')
               .html(submitLabel)
-              .appendTo($btnsWrappers);
+              .appendTo($buttonsWrappers);
           }
 
           // Append 'cancel' button
@@ -291,7 +310,7 @@
               .addClass('btn')
               .addClass('btn-default')
               .html(cancelLabel)
-              .appendTo($btnsWrappers);
+              .appendTo($buttonsWrappers);
           }
         }
       },
@@ -366,8 +385,18 @@
       /** Bind User-Events on autocomplete. */
       bind: function() {
         var that = this;
+        var $input = that.$input;
+        var $ul = that.$ul;
 
-        that.$input.on('keyup' + NAMESPACE, function(e) {
+        var prevent = function(e, stopImmediate) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (stopImmediate) {
+            e.stopImmediatePropagation();
+          }
+        };
+
+        var onKeyup = function(e) {
           var keyCode = e.keyCode;
           if (keyCode !== ENTER_KEY && keyCode !== ARROW_DOWN && keyCode !== ARROW_UP) {
             var filter = $.trim($(this).val());
@@ -380,17 +409,9 @@
               that.clear();
             }
           }
-        });
-
-        var prevent = function(e, stopImmediate) {
-          e.preventDefault();
-          e.stopPropagation();
-          if (stopImmediate) {
-            e.stopImmediatePropagation();
-          }
         };
 
-        that.$input.on('keydown' + NAMESPACE, function(e) {
+        var onKeydown = function(e) {
           var keyCode = e.keyCode;
           if (keyCode === ARROW_DOWN) {
             prevent(e);
@@ -410,13 +431,13 @@
           else if (keyCode === TAB) {
             that.select(that.idx);
           }
-        });
+        };
 
-        that.$input.on('focusout' + NAMESPACE, function() {
+        var onFocusout = function() {
           that.focus = false;
           var $this = $(this);
           setTimeout(function() {
-            if (!that.focus && !that.$creation && that.$ul) {
+            if (that && !that.focus && !that.$creation && that.$ul) {
               that.$hide();
               if (!that.item) {
                 that.autoSelect($.trim($this.val()));
@@ -424,23 +445,40 @@
               that.opts.focusout.call(that, that.item);
             }
           }, 200);
-        });
+        };
 
-        that.$input.on('focusin' + NAMESPACE, function() {
+        var onFocusin = function() {
           that.focus = true;
           if ((!that.item) && (that.results.length > 0)) {
             that.$show();
           }
-        });
+        };
 
-        that.$ul.on('mouseenter' + NAMESPACE, function() {
+        $input.on('keyup' + NAMESPACE, onKeyup);
+        $input.on('keydown' + NAMESPACE, onKeydown);
+        $input.on('focusout' + NAMESPACE, onFocusout);
+        $input.on('focusin' + NAMESPACE, onFocusin);
+
+        var onMouseenter = function() {
           $(this).find('li').removeClass(ACTIVE_CLASS);
-        });
+        };
 
-        that.$ul.on('click' + NAMESPACE, 'li', function() {
+        var onClickItem = function() {
           that.select(toInt($(this).attr('data-idx')));
           that.$input.focus();
-        });
+        };
+
+        $ul.on('mouseenter' + NAMESPACE, onMouseenter);
+        $ul.on('click' + NAMESPACE, 'li', onClickItem);
+
+        var destroy = function() {
+          that.destroy();
+          that = null;
+          $input = null;
+          $ul = null;
+        };
+
+        $input.on('jqAutoCompleteRemoved ', destroy);
 
         that.bindForm();
       },
@@ -450,23 +488,26 @@
         var that = this;
 
         if (that.$link) {
-          that.$link.on('click' + NAMESPACE, function(e) {
+          var onClickShowForm = function(e) {
             e.preventDefault();
             that.showCreationForm();
-          });
+          };
+          that.$link.on('click' + NAMESPACE, onClickShowForm);
         }
 
         if (that.$cancel) {
-          that.$cancel.on('click' + NAMESPACE, function() {
+          var onClickCancel = function() {
             that.hideCreationForm();
-          });
+          };
+          that.$cancel.on('click' + NAMESPACE, onClickCancel);
         }
 
         if (that.$form) {
-          that.$form.on('submit' + NAMESPACE, function(e) {
+          var onSubmit = function(e) {
             e.preventDefault();
             that.create();
-          });
+          };
+          that.$form.on('submit' + NAMESPACE, onSubmit);
         }
       },
 
@@ -550,7 +591,7 @@
               data: params
             });
 
-            that.xhr.done(function(datas) {
+            var onDone = function(datas) {
               that.timer = null;
               that.xhr = null;
 
@@ -560,7 +601,20 @@
               }
 
               that.show(datas);
-            });
+            };
+
+            var onComplete = function() {
+              // Prevent memory leak
+              that = null;
+              params = null;
+              key = null;
+            };
+
+            that.xhr.done(onDone);
+            that.xhr.always(onComplete);
+
+            // Prevent memory leak
+            request = null;
           };
 
           // Launch request in 200ms
@@ -634,17 +688,18 @@
         var that = this;
         if (that.$form && !that.$creation) {
           that.$creation = true;
-          that.$ul.fadeOut('fast', function() {
-            if (that.$link) {
-              that.$link.hide();
-            }
+          that.$ul.hide();
 
-            that.$form.show();
-            that.$form.find('input[type="text"]').eq(0)
-              .val(that.$input.val())
-              .focus();
-          });
+          if (that.$link) {
+            that.$link.hide();
+          }
+
+          that.$form.show();
+          that.$form.find('input[type="text"]').eq(0)
+            .val(that.$input.val())
+            .focus();
         }
+        that = null;
       },
 
       /** Hide form used to create new item. */
@@ -652,15 +707,17 @@
         var that = this;
         if (that.$form && that.$creation) {
           that.$creation = false;
-          that.$form.fadeOut('fast', function() {
-            if (that.$link) {
-              that.$link.show();
-            }
 
-            that.$ul.show();
-            that.$input.focus();
-          });
+          that.$form.hide();
+
+          if (that.$link) {
+            that.$link.show();
+          }
+
+          that.$ul.show();
+          that.$input.focus();
         }
+        that = null;
       },
 
       /** Create new item */
@@ -709,19 +766,35 @@
             data: datas
           });
 
-          xhr.done(function(data) {
+          var destroy = function() {
+            // Prevent memory leak
+            that = null;
+            array = null;
+            datas = null;
+            xhr = null;
+            onDone = null;
+            onFail = null;
+            onComplete = null;
+          };
+
+          var onDone = function(data) {
             that.opts.onSavedSuccess.apply(null, arguments);
             that.val(data);
             that.$hide();
-          });
+          };
 
-          xhr.fail(function() {
+          var onFail = function() {
             that.opts.onSavedFailed.apply(null, arguments);
-          });
+          };
 
-          xhr.always(function() {
+          var onComplete = function() {
             that.$saving = false;
-          });
+            destroy();
+          };
+
+          xhr.done(onDone);
+          xhr.fail(onFail);
+          xhr.always(onComplete);
         }
       },
 
@@ -852,14 +925,17 @@
       /** Unbind creation form */
       unbindForm: function() {
         var that = this;
+
         if (that.$form) {
-          that.$form.off(NAMESPACE);
+          that.$form.off();
         }
+
         if (that.$cancel) {
-          that.$cancel.off(NAMESPACE);
+          that.$cancel.off();
         }
+
         if (that.$link) {
-          that.$link.off(NAMESPACE);
+          that.$link.off();
         }
       },
 
@@ -869,7 +945,6 @@
 
         that.opts.onDestroyed.call(that);
         that.unbind();
-        that.$ul.remove();
 
         if (that.timer) {
           clearTimeout(that.timer);
@@ -879,8 +954,24 @@
           that.xhr.abort();
         }
 
+        if (that.$link) {
+          that.$link.remove();
+        }
+
+        if (that.$cancel) {
+          that.$cancel.remove();
+        }
+
+        if (that.$form) {
+          that.$form.remove();
+        }
+
+        that.$ul.remove();
+        that.$results.remove();
+
         for (var i in that) {
           if (that.hasOwnProperty(i)) {
+            console.log('destroy ' + i);
             that[i] = null;
           }
         }

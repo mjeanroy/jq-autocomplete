@@ -507,19 +507,19 @@ describe("jQuery AutoComplete Test Suite", function() {
         this.autocomplete.hideCreationForm();
 
         expect(this.autocomplete.$creation).toBe(false);
-        expect(this.autocomplete.$form.fadeOut).toHaveBeenCalledWith('fast', jasmine.any(Function));
+        expect(this.autocomplete.$form.hide).toHaveBeenCalled();
         expect(this.autocomplete.$ul.show).toHaveBeenCalled();
         expect(this.autocomplete.$input.focus).toHaveBeenCalled();
         expect(this.autocomplete.$link.show).toHaveBeenCalled();
       });
 
-      it("should hide creation form if form was not visible", function() {
+      it("should not hide creation form if form was not visible", function() {
         this.autocomplete.$creation = false;
 
         this.autocomplete.hideCreationForm();
 
         expect(this.autocomplete.$creation).toBe(false);
-        expect(this.autocomplete.$form.fadeOut).not.toHaveBeenCalled();
+        expect(this.autocomplete.$form.hide).not.toHaveBeenCalled();
         expect(this.autocomplete.$ul.show).not.toHaveBeenCalled();
         expect(this.autocomplete.$input.focus).not.toHaveBeenCalled();
         expect(this.autocomplete.$link.show).not.toHaveBeenCalled();
@@ -535,7 +535,7 @@ describe("jQuery AutoComplete Test Suite", function() {
         this.autocomplete.showCreationForm();
 
         expect(this.autocomplete.$creation).toBe(true);
-        expect(this.autocomplete.$ul.fadeOut).toHaveBeenCalledWith('fast', jasmine.any(Function));
+        expect(this.autocomplete.$ul.hide).toHaveBeenCalledWith();
         expect(this.autocomplete.$form.show).toHaveBeenCalled();
         expect(this.autocomplete.$form.eq).toHaveBeenCalledWith(0);
         expect(this.autocomplete.$link.hide).toHaveBeenCalled();
