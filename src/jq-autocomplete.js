@@ -994,18 +994,6 @@
         $that.removeData(PLUGIN_NAME);
       };
 
-      /** Clear autocomplete suggestions */
-      that.clear = function() {
-        $that.data(PLUGIN_NAME).clear();
-        return that;
-      };
-
-      /** Empty autocomplete */
-      that.empty = function() {
-        $that.data(PLUGIN_NAME).empty();
-        return that;
-      };
-
       /** Get/Set value */
       that.val = function(obj) {
         var autocomplete = $that.data(PLUGIN_NAME);
@@ -1016,24 +1004,14 @@
         return autocomplete.item;
       };
 
-      /** Hide autocomplete */
-      that.hide = function() {
-        $that.data(PLUGIN_NAME).hide();
-      };
-
-      /**
-       * Show autocomplete with specified datas
-       * @param {array} datas Datas.
-       */
-      that.show = function(datas) {
-        $that.data(PLUGIN_NAME).show(datas);
-      };
-
-      /** Clear autocomplete internal cache */
-      that.clearCache = function() {
-        $that.data(PLUGIN_NAME).clearCache();
-        return that;
-      };
+      // Shortcuts to functions
+      $.each(['hide', 'show', 'clearCache', 'empty', 'clear'], function(idx, value) {
+        that[value] = function() {
+          var plugin = $that.data(PLUGIN_NAME);
+          plugin[value].apply(plugin, arguments);
+          return that;
+        };
+      });
 
       return that.each(function() {
         var autocomplete = $(this).data(PLUGIN_NAME);

@@ -245,6 +245,20 @@ describe("jQuery AutoComplete Test Suite", function() {
     expect(result).toBe(this.$input);
   });
 
+  it("should call clear cache function", function() {
+    // GIVEN
+    this.$input.jqAutoComplete();
+    var autocomplete = this.$input.data('jqAutoComplete');
+    spyOn(autocomplete, 'clearCache');
+
+    // WHEN
+    var result = this.$input.jqAutoComplete().clearCache();
+
+    // THEN
+    expect(autocomplete.clearCache).toHaveBeenCalled();
+    expect(result).toBe(this.$input);
+  });
+
   it("should call empty function", function() {
     // GIVEN
     this.$input.jqAutoComplete();
@@ -1885,6 +1899,20 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect(this.keydownEvent.preventDefault).not.toHaveBeenCalled();
         expect(this.keydownEvent.stopPropagation).not.toHaveBeenCalled();
         expect(this.autocomplete.select).toHaveBeenCalledWith(0);
+      });
+    });
+
+    describe("Check Destroy Events", function() {
+      beforeEach(function() {
+        spyOn(this.autocomplete, 'destroy');
+      });
+
+      it("should destroy plugin when input is removed from dom", function() {
+        // WHEN
+        this.autocomplete.$input.remove();
+
+        // THEN
+        expect(this.autocomplete.destroy).toHaveBeenCalled();
       });
     });
   });
