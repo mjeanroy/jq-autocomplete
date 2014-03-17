@@ -104,31 +104,31 @@ Note that callbacks are more documented below.
 
 Following callbacks can be set at initialization:
 
-# `function label(obj) : {string}`
+`function label(obj) : {string}`
 
 Callback that can be defined to return the formatted string to display in suggestion list.
 
-# `function select(obj)`
+`function select(obj)`
 
 Callback called when an element is selected. First parameter of callback is the new selected element.
 
-# `function unSelect()`
+`function unSelect()`
 
 Callback called when element is de-selected.
 
-# `function onShown()`
+`function onShown()`
 
 Callback called when suggestions list (or creation form) is displayed.
 
-# `function onHidden()`
+`function onHidden()`
 
 Callback called when suggestions list (or creation form) is hidden.
 
-# `function focusout()`
+`function focusout()`
 
 Callback called when 'focus out' event is triggered on input.
 
-# `function isValid(data, $form) : {*}`
+`function isValid(data, $form) : {*}`
 
 Callback called before creation of new entry.
 
@@ -140,14 +140,14 @@ Returns:
 
 Whatever, a **falsy value** (a.k.a. `0`, `false`, `''`, `null` or `undefined`) means that the form is **not valid**, a **truthy value** means that the form is **valid**.
 
-# `function onSaved(data) : {object}`
+`function onSaved(data) : {object}`
 
 Callback that can be used to override saved data before request.
 
 Parameters:
 - `data` Data that will be saved.
 
-# `function onSavedSuccess(data, textStatus, jqXHR)`
+`function onSavedSuccess(data, textStatus, jqXHR)`
 
 Callback called when creation request succeed.
 
@@ -156,7 +156,7 @@ Parameters:
 - `textStatus` Status as formatted string.
 - `jqXhr` Original XHR.
 
-# `function onSavedFailed(jqXhr, textStatus, errorThrown)`
+`function onSavedFailed(jqXhr, textStatus, errorThrown)`
 
 Callback called when creation request failed.
 
@@ -165,7 +165,7 @@ Parameters:
 - `textStatus` Status as formatted string.
 - `errorThrown` Exception object if one occured.
 
-# `function onDestroyed()`
+`function onDestroyed()`
 
 Callback called when plugin is destroyed.
 
@@ -173,19 +173,19 @@ Callback called when plugin is destroyed.
 
 Autocomplete instance has following methods:
 
-# `function hide()`:
+`function hide()`:
 
 Hide auto-complete results (or creation form).
 
-# `function show()`
+`function show()`
 
 Show auto-complete results.
 
-# `clearCache`: `function()`
+`function clearCache()`
 
 Clear auto-complete cache.
 
-# `function empty()`
+`function empty()`
 
 - Clear autocomplete:
   - Clear and hide suggestions.
@@ -193,19 +193,19 @@ Clear auto-complete cache.
 
 - Clear input value.
 
-# `function clear()`
+`function clear()`
 
 - Clear autocomplete:
   - Clear and hide suggestions.
   - Deselect active result.
 - Input value is not updated.
 
-# `function val([data])` - Get / Set auto-complete value.
+`function val([data])` - Get / Set auto-complete value.
 
 - If function is called without parameter, current selected value is returned.
 - If function is called with a parameter, selected value is updated with parameter value.
 
-# `function destroy()`
+`function destroy()`
 
 Destroy plugin:
 - Clear internal data.
