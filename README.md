@@ -3,14 +3,14 @@ jq-autocomplete
 
 Very simple autocomplete for text input field.
 
-Getting started
----------------
-
 ### How?
 
 HTML:
 
+jQuery is the only dependency:
+
 ```
+<script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="jq-autocomplete.js"></script>
 <link rel="stylesheet" href="jq-autocomplete.css"/>
 
@@ -19,7 +19,7 @@ HTML:
 
 JS:
 
-```
+```javascript
 $('#my-autocomplete').jqAutoComplete();
 ```
 
@@ -230,8 +230,9 @@ Clear auto-complete cache.
 
 ***
 
-`function val([data])` - Get / Set auto-complete value.
+`function val([data])`
 
+Get / Set auto-complete value:
 - If function is called without parameter, current selected value is returned.
 - If function is called with a parameter, selected value is updated with parameter value.
 
