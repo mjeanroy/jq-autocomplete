@@ -69,39 +69,39 @@ Don't worry about memory management, plugin will be automatically destroyed when
 
 - `url`: URL used to fetch results.
 
-- `method`: HTTP method used to fetch results. Default is *GET*.
+- `method`: HTTP method used to fetch results. Default is **GET**.
 
-- `minSize`: : Minimum number of characters required to trigger autocomplete. Default is *3*.
+- `minSize`: : Minimum number of characters required to trigger autocomplete. Default is **3**.
 
-- `limit`: Maximum number of results to retrieve (will be sent over http). Default is *10*.
+- `limit`: Maximum number of results to retrieve (will be sent over http). Default is **10**.
 
-- `filterName`: Name of parameter containing filter value. Default is *filter*.
+- `filterName`: Name of parameter containing filter value. Default is **filter**.
 
-- `limitName`: Name of parameter containing limit value. Default is *limit*.
+- `limitName`: Name of parameter containing limit value. Default is **limit**.
 
-- `datas`: Custom parameter that will added to the fetch query. Default is *null* (it means that no additional parameter is sent).
+- `datas`: Custom parameter that will added to the fetch query. Default is **null** (it means that no additional parameter is sent).
 
-- `cache`: Boolean value indicating whether to cache autocomplete results. Default is *true*.
+- `cache`: Boolean value indicating whether to cache autocomplete results. Default is **true**.
 
-- `label`: Field to show in suggestions list. Can be a string (field that will be display) or a function (must return the formatted field to display). Default is *label*.
+- `label`: Field to show in suggestions list. Can be a string (field that will be display) or a function (must return the formatted field to display). Default is **label**.
 
-- `relativeTo`: Suggestion list will be in absolute position. Relative position will be appended to input parent by default, unless an other selector is set using this option. Default is *null*. 
+- `relativeTo`: Suggestion list will be in absolute position. Relative position will be appended to input parent by default, unless an other selector is set using this option. Default is **null**. 
 
 - `$createForm`: Form that will be display to create new result.
 
 - `saveUrl`: URL that will be used to save current result. Default is the GET url.
 
-- `saveMethod`: HTTP method that will be used to save new result. Default is *POST*.
+- `saveMethod`: HTTP method that will be used to save new result. Default is **POST**.
 
-- `saveDataType`: Content-Type returned by creation request. Default is *json*".
+- `saveDataType`: Content-Type returned by creation request. Default is **json**.
 
-- `saveContentType`: Content-Type added to creation request. Default is *application/x-www-form-urlencoded; charset=UTF-8*.
+- `saveContentType`: Content-Type added to creation request. Default is **application/x-www-form-urlencoded; charset=UTF-8**.
 
-- `createLabel`: Link displayed to show creation form. Default is *Not here? Create it!*.
+- `createLabel`: Link displayed to show creation form. Default is **Not here? Create it!**.
 
-- `cancel`: Label displayed in cancel 'button' (in creation form). Default is *Cancel*.
+- `cancel`: Label displayed in cancel 'button' (in creation form). Default is **Cancel**.
 
-- `submit`: Label displayed in submit 'button' (in creation form). Default is *Save*.
+- `submit`: Label displayed in submit 'button' (in creation form). Default is **Save**.
 
 - `isValid`: Callback function used to check validity of creation form and called before creation request. If function return a falsy value, creation request will not be triggered.
 
