@@ -19,6 +19,12 @@ module.exports = function(config) {
         included: true
       },
       {
+        pattern: 'components/jquery/dist/jquery.js',
+        watched: false,
+        served: true,
+        included: true
+      },
+      {
         pattern: 'src/*.js',
         watched: true,
         served: true,
