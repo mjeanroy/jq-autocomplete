@@ -23,6 +23,16 @@ JS:
 $('#my-autocomplete').jqAutoComplete();
 ```
 
+Results:
+
+Suggestions are automatically added below the input field:
+
+![Auto Complete](docs/001.png)
+
+Select active result using up / down key or click with your mouse:
+
+![Auto Complete](docs/002.png)
+
 ### Advanced
 
 #### HTML initialization
@@ -36,16 +46,6 @@ Every option can be inlined such as:
        data-method="get"
 />
 ```
-
-Results:
-
-Suggestions are automatically added below the input field:
-
-![Auto Complete](docs/001.png)
-
-Select active result using up / down key or click with your mouse:
-
-![Auto Complete](docs/002.png)
 
 #### Cache
 A cache is automatically managed by autocomplete (but it can be disabled). It means that the first time a query is sent, results are automatically saved. Next time, results will be retrieved from cache and the HTTP request will not be executed again.
