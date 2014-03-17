@@ -123,7 +123,13 @@ Don't worry about memory management, plugin will be automatically destroyed when
 
 - `focusout`: Callback function called when focus out event is triggered.
 
-### Licence
+### License
+
+jq-autocomplete is freely distributable under the terms of an MIT-style license.
+
+Copyright notice and permission notice shall be included in all copies or substantial portions of the Software.
 
 ### Credits
+
+Author: Mickael Jeanroy / @mickaeljeanroy
 
