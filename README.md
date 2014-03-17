@@ -67,34 +67,150 @@ Don't worry about memory management, plugin will be automatically destroyed when
 
 ### Options
 
+Note that callbacks are more documented below.
+
 - `url`: URL used to fetch results.
-- `method`: HTTP method used to fetch results. Default is **GET**.
-- `minSize`: : Minimum number of characters required to trigger autocomplete. Default is **3**.
-- `limit`: Maximum number of results to retrieve (will be sent over http). Default is **10**.
-- `filterName`: Name of parameter containing filter value. Default is **filter**.
-- `limitName`: Name of parameter containing limit value. Default is **limit**.
-- `datas`: Custom parameter that will added to the fetch query. Default is **null** (it means that no additional parameter is sent).
-- `cache`: Boolean value indicating whether to cache autocomplete results. Default is **true**.
-- `label`: Field to show in suggestions list. Can be a string (field that will be display) or a function (must return the formatted field to display). Default is **label**.
-- `relativeTo`: Suggestion list will be in absolute position. Relative position will be appended to input parent by default, unless an other selector is set using this option. Default is **null**. 
+- `method`: HTTP method used to fetch results. Default is `GET`.
+- `minSize`: : Minimum number of characters required to trigger autocomplete. Default is `3`.
+- `limit`: Maximum number of results to retrieve (will be sent over http). Default is `10`.
+- `filterName`: Name of parameter containing filter value. Default is `filter`.
+- `limitName`: Name of parameter containing limit value. Default is `limit`.
+- `datas`: Custom parameter that will added to the fetch query. Default is `null` (it means that no additional parameter is sent).
+- `cache`: Boolean value indicating whether to cache autocomplete results. Default is `true`.
+- `label`: Field to show in suggestions list. Can be a string (field that will be display) or a function (must return the formatted field to display). Default is `label`.
+- `relativeTo`: Suggestion list will be in absolute position. Relative position will be appended to input parent by default, unless an other selector is set using this option. Default is `null`. 
 - `$createForm`: Form that will be display to create new result.
 - `saveUrl`: URL that will be used to save current result. Default is the GET url.
-- `saveMethod`: HTTP method that will be used to save new result. Default is **POST**.
-- `saveDataType`: Content-Type returned by creation request. Default is **json**.
-- `saveContentType`: Content-Type added to creation request. Default is **application/x-www-form-urlencoded; charset=UTF-8**.
-- `createLabel`: Link displayed to show creation form. Default is **Not here? Create it!**.
-- `cancel`: Label displayed in cancel 'button' (in creation form). Default is **Cancel**.
-- `submit`: Label displayed in submit 'button' (in creation form). Default is **Save**.
+- `saveMethod`: HTTP method that will be used to save new result. Default is `POST`.
+- `saveDataType`: Content-Type returned by creation request. Default is `json`.
+- `saveContentType`: Content-Type added to creation request. Default is `application/x-www-form-urlencoded; charset=UTF-8`.
+- `createLabel`: Link displayed to show creation form. Default is `Not here? Create it!`.
+- `cancel`: Label displayed in cancel 'button' (in creation form). Default is `Cancel`.
+- `submit`: Label displayed in submit 'button' (in creation form). Default is `Save`.
+- `select`: Callback function called when a suggestion result is selected.
+- `unSelect`: Callback function called when selected result is "un-selected".
+- `onShown`: Callback function called when suggestion list is displayed.
+- `onHidden`: Callback function called when suggestion list is hidden.
 - `isValid`: Callback function used to check validity of creation form and called before creation request. If function return a falsy value, creation request will not be triggered.
+- `focusout`: Callback function called when focus out event is triggered.
 - `onSaved`: Callback function called before creation request. Returned object will be used as parameter during creation request (useful to override some parameter).
 - `onSavedSuccess`: Callback function called after creation request succeed.
 - `onSavedFailed`: Callback function called after creation request failed.
-- `onShown`: Callback function called when suggestion list is displayed.
-- `onHidden`: Callback function called when suggestion list is hidden.
 - `onDestroyed`: Callback function called when autocomplete plugin is destroyed.
-- `select`: Callback function called when a suggestion result is selected.
-- `unSelect`: Callback function called when selected result is "un-selected".
-- `focusout`: Callback function called when focus out event is triggered.
+
+### API
+
+#### Callbacks
+
+Following callbacks can be set at initialization:
+
+# `function label(obj) : {string}`
+
+Callback that can be defined to return the formatted string to display in suggestion list.
+
+# `function select(obj)`
+
+Callback called when an element is selected. First parameter of callback is the new selected element.
+
+# `function unSelect()`
+
+Callback called when element is de-selected.
+
+# `function onShown()`
+
+Callback called when suggestions list (or creation form) is displayed.
+
+# `function onHidden()`
+
+Callback called when suggestions list (or creation form) is hidden.
+
+# `function focusout()`
+
+Callback called when 'focus out' event is triggered on input.
+
+# `function isValid(data, $form) : {*}`
+
+Callback called before creation of new entry.
+
+Parameters:
+- `data` First parameter is the form serialized as an object.
+- `$form` Second parameter is the form.
+
+Returns:
+
+Whatever, a **falsy value** (a.k.a. `0`, `false`, `''`, `null` or `undefined`) means that the form is **not valid**, a **truthy value** means that the form is **valid**.
+
+# `function onSaved(data) : {object}`
+
+Callback that can be used to override saved data before request.
+
+Parameters:
+- `data` Data that will be saved.
+
+# `function onSavedSuccess(data, textStatus, jqXHR)`
+
+Callback called when creation request succeed.
+
+Parameters:
+- `data` Response.
+- `textStatus` Status as formatted string.
+- `jqXhr` Original XHR.
+
+# `function onSavedFailed(jqXhr, textStatus, errorThrown)`
+
+Callback called when creation request failed.
+
+Parameters:
+- `jqXhr` Original XHR.
+- `textStatus` Status as formatted string.
+- `errorThrown` Exception object if one occured.
+
+# `function onDestroyed()`
+
+Callback called when plugin is destroyed.
+
+#### Public methods
+
+Autocomplete instance has following methods:
+
+# `function hide()`:
+
+Hide auto-complete results (or creation form).
+
+# `function show()`
+
+Show auto-complete results.
+
+# `clearCache`: `function()`
+
+Clear auto-complete cache.
+
+# `function empty()`
+
+- Clear autocomplete:
+  - Clear and hide suggestions.
+  - Deselect active result.
+
+- Clear input value.
+
+# `function clear()`
+
+- Clear autocomplete:
+  - Clear and hide suggestions.
+  - Deselect active result.
+- Input value is not updated.
+
+# `function val([data])` - Get / Set auto-complete value.
+
+- If function is called without parameter, current selected value is returned.
+- If function is called with a parameter, selected value is updated with parameter value.
+
+# `function destroy()`
+
+Destroy plugin:
+- Clear internal data.
+- Unbind user events.
+- Remove DOM elements created by plugin.
 
 ### License
 
