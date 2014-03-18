@@ -38,16 +38,27 @@
               scope.ngModel = undefined;
               scope.ngChange();
             });
+          },
+          onDestroyed: function() {
+            scope.$apply(function() {
+              scope.onDestroyed();
+            });
           }
         });
 
-        $input.jqAutoComplete(opts);
+        var $autocomplete = $input.jqAutoComplete(opts);
+
+        scope.$on('$destroy', function() {
+          $autocomplete.destroy();
+          $autocomplete = null;
+        });
       },
       scope: {
         ngModel: '=',
         ngChange: '&',
         onShown: '&',
         onHidden: '&',
+        onDestroyed: '&',
         transformResults: '&'
       },
       template: function() {
