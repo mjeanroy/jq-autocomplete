@@ -26,6 +26,7 @@
 <head>
   <title>Sample jq-AutoComplete</title>
   <script type="text/javascript" src="jquery/jquery.js"></script>
+  <script type="text/javascript" src="jquery/dist/jquery.js"></script>
 
   <script type="text/javascript">
     // Set cache to zero (use to test memory leak)
@@ -49,8 +50,23 @@
 
 <div>My Choice is : <span id="js-choice"></span></div>
 
+<hr>
+
 <div>
   Search for some awesome frameworks (html initialization) : <input id="html-initialization" type="text" data-url="/search" data-min-size="3" data-label="label" data-cache="true"/>
+</div>
+
+<hr>
+
+<div>
+  Search github repositories using jsonp :
+  <input id="jsonp-autocomplete" 
+         type="text"
+         data-url="https://api.github.com/search/repositories"
+         data-min-size="3"
+         data-filter-name="q"
+         data-label="name"
+         data-data-type="jsonp"/>
 </div>
 
 <form class="form-creation">
@@ -60,6 +76,8 @@
   <label for="input-framework-version">Framework Version :</label>
   <input id="input-framework-version" type="text" name="version" required="required"/>
 </form>
+
+<hr>
 
 <button id="btn-remove" type="button" class="btn btn-primary">Remove</button>
 
@@ -79,6 +97,12 @@
     },
     unSelect: function() {
       $choice.empty();
+    }
+  });
+
+  $('#jsonp-autocomplete').jqAutoComplete({
+    transformResults: function(data) {
+      return data.data.items;
     }
   });
 

@@ -200,7 +200,24 @@
      * @return {number} Parsed number.
      */
     var toInt = function(val) {
-      return parseInt(val, 10);
+      return val === undefined ? val : parseInt(val, 10);
+    };
+
+    /**
+     * Convert string value to boolean:
+     * - If value is strictly equals to 'true', then true value is returned.
+     * - Otherwise false value is returned.
+     * @param {*} val Value to convert.
+     * @return {*} Boolean value if parameter is a string, parameter otherwise.
+     */
+    var toBoolean = function(val) {
+      if (val === 'true') {
+        return true;
+      }
+      if (val === 'false') {
+        return false;
+      }
+      return val;
     };
 
     /**
@@ -215,6 +232,22 @@
       } else {
         return str.startsWith(start);
       }
+    };
+
+
+    /**
+     * Turn a string with '-' separator to a camel case string.
+     * @param {string} str String to convert.
+     * @return {string} Camel case string.
+     */
+    var toCamelCase = function(str) {
+        var array = str.split('-');
+        for (var i = 0, ln = array.length; i < ln; ++i) {
+          var current = array[i].toLowerCase();
+          array[i] = current.charAt(0).toUpperCase() + current.splice(1);
+        }
+        array[0] = array[0].toLowerCase();
+        return array.join('');
     };
 
     // Add special event to destroy plugin before it is removed from the DOM
@@ -340,38 +373,36 @@
        * @return {object} Initialization object initialized with data attributes.
        */
       readDatas: function() {
-        var datas = {};
+        var dataAttrs = {};
         var $input = this.$input;
 
-        datas.minSize = data($input, 'min-size');
-        datas.limit = data($input, 'limit');
-        datas.url = data($input, 'url');
-        datas.saveUrl = data($input, 'save-url');
-        datas.saveMethod = data($input, 'save-method');
-        datas.saveDataType = data($input, 'save-data-type');
-        datas.saveContentType = data($input, 'save-content-type');
-        datas.$createForm = data($input, 'create-form');
-        datas.createLabel = data($input, 'create-label');
-        datas.cancel = data($input, 'Cancel');
-        datas.submit = data($input, 'Submit');
-        datas.method = data($input, 'method');
-        datas.limitName = data($input, 'limit-name');
-        datas.filterName = data($input, 'filter-name');
-        datas.label = data($input, 'label');
-        datas.cache = data($input, 'cache') || false;
-        datas.relativeTo = data($input, 'relative-to');
+        dataAttrs.minSize = data($input, 'min-size');
+        dataAttrs.limit = data($input, 'limit');
+        dataAttrs.url = data($input, 'url');
+        dataAttrs.saveUrl = data($input, 'save-url');
+        dataAttrs.saveMethod = data($input, 'save-method');
+        dataAttrs.saveDataType = data($input, 'save-data-type');
+        dataAttrs.saveContentType = data($input, 'save-content-type');
+        dataAttrs.$createForm = data($input, 'create-form');
+        dataAttrs.createLabel = data($input, 'create-label');
+        dataAttrs.cancel = data($input, 'Cancel');
+        dataAttrs.submit = data($input, 'Submit');
+        dataAttrs.method = data($input, 'method');
+        dataAttrs.limitName = data($input, 'limit-name');
+        dataAttrs.filterName = data($input, 'filter-name');
+        dataAttrs.label = data($input, 'label');
+        dataAttrs.cache = data($input, 'cache') || false;
+        dataAttrs.relativeTo = data($input, 'relative-to');
+        dataAttrs.dataType = data($input, 'data-type');
+        dataAttrs.jsonp = data($input, 'jsonp');
+        dataAttrs.jsonpCallback = data($input, 'jsonp-callback');
 
-        if (datas.minSize !== undefined) {
-          datas.minSize = toInt(datas.minSize);
-        }
-        if (datas.limit !== undefined) {
-          datas.limit = toInt(datas.limit);
-        }
-        if (typeof datas.cache === 'string') {
-          datas.cache = !!(datas.cache === 'true');
-        }
+        dataAttrs.minSize = toInt(dataAttrs.minSize);
+        dataAttrs.limit = toInt(dataAttrs.limit);
+        dataAttrs.cache = toBoolean(dataAttrs.cache);
+        dataAttrs.jsonp = toBoolean(dataAttrs.jsonp);
 
-        return datas;
+        return dataAttrs;
       },
 
       /** Position result list in fixed position below input field. */
@@ -587,42 +618,56 @@
         }
         else {
           var request = function() {
+            var opts = that.opts;
+
             // Build default parameters
             var params = {};
 
-            params[that.opts.filterName] = that.filter;
-            if (that.opts.limit > 0) {
-              params[that.opts.limitName] = that.opts.limit;
+            params[opts.filterName] = that.filter;
+            if (opts.limit > 0) {
+              params[opts.limitName] = opts.limit;
             }
 
             // Append custom datas to parameters
-            if (that.opts.datas) {
-              if (typeof that.opts.datas === 'object') {
-                params = $.extend(params, that.opts.datas);
+            if (opts.datas) {
+              if (typeof opts.datas === 'object') {
+                params = $.extend(params, opts.datas);
               }
-              else if (typeof that.opts.datas === 'function') {
-                params = $.extend(params, that.opts.datas.apply(that));
+              else if (typeof opts.datas === 'function') {
+                params = $.extend(params, opts.datas.apply(that));
               }
             }
 
-            // Launch request
-            that.xhr = $.ajax({
-              url: that.opts.url,
-              type: that.opts.method,
-              dataType: 'json',
-              data: params
-            });
+            var dataType = opts.dataType;
 
-            var onDone = function(datas) {
+            var ajaxOpts = {
+              url: opts.url,
+              type: opts.method,
+              dataType: dataType,
+              data: params
+            };
+
+            var isJsonp = (dataType || '').toLowerCase().indexOf('jsonp') >= 0;
+            if (isJsonp) {
+              ajaxOpts.jsonp = opts.jsonp;
+              ajaxOpts.jsonpCallback = opts.jsonpCallback;
+            }
+
+            // Launch request
+            that.xhr = $.ajax(ajaxOpts);
+
+            var onDone = function(results) {
               that.timer = null;
               that.xhr = null;
 
-              if (that.opts.cache) {
+              var transformedResults = opts.transformResults(results);
+
+              if (opts.cache) {
                 // Store in cache
-                that.caches[key] = datas;
+                that.caches[key] = transformedResults;
               }
 
-              that.show(datas);
+              that.show(transformedResults);
             };
 
             var onComplete = function() {
@@ -630,6 +675,7 @@
               that = null;
               params = null;
               key = null;
+              opts = null;
             };
 
             that.xhr.done(onDone);
@@ -1058,6 +1104,9 @@
       label: identity,
       minSize: 3,
       method: 'GET',
+      dataType: 'json',
+      jsonp: undefined,
+      jsonpCallback: undefined,
       saveMethod: '',
       saveDataType: 'json',
       saveContentType: 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -1075,6 +1124,7 @@
       onSavedFailed: noop,
       isValid: fnTrue,
       relativeTo: null,
+      transformResults: identity,
       focusout: noop,
       select: noop,
       unSelect: noop,

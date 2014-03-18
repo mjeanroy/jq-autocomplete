@@ -78,6 +78,9 @@ describe("jQuery AutoComplete Test Suite", function() {
     expect(ac.opts).not.toBe($.fn.jqAutoComplete.options);
     expect(ac.opts).toEqual({
       url: '/search',
+      dataType: 'json',
+      jsonp: undefined,
+      jsonpCallback: undefined,
       saveUrl: '',
       label: jasmine.any(Function),
       minSize: 3,
@@ -91,6 +94,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       datas: null,
       cache: false,
       relativeTo: null,
+      transformResults: jasmine.any(Function),
       $createForm: null,
       createLabel: 'Not here? Create it!',
       cancel: 'Cancel',
@@ -126,6 +130,9 @@ describe("jQuery AutoComplete Test Suite", function() {
     this.$input.attr('data-method', 'POST');
     this.$input.attr('data-label', 'label');
     this.$input.attr('data-cache', 'true');
+    this.$input.attr('data-data-type', 'jsonp');
+    this.$input.attr('data-jsonp', 'false');
+    this.$input.attr('data-jsonp-callback', 'foo');
 
     // WHEN
     expect(this.$input.data('jqAutoComplete')).toBeFalsy();
@@ -145,6 +152,9 @@ describe("jQuery AutoComplete Test Suite", function() {
     expect(ac.opts).not.toBe($.fn.jqAutoComplete.options);
     expect(ac.opts).toEqual({
       url: '/search',
+      dataType: 'jsonp',
+      jsonp: false,
+      jsonpCallback: 'foo',
       saveUrl: '/save',
       label: 'label',
       minSize: 2,
@@ -157,6 +167,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       limitName: 'myLimit',
       datas: null,
       cache: true,
+      transformResults: jasmine.any(Function),
       relativeTo: null,
       $createForm: '#foo',
       createLabel: 'Create it!',
@@ -1303,6 +1314,109 @@ describe("jQuery AutoComplete Test Suite", function() {
         expect(this.autocomplete.xhr).toBe(null);
         expect(this.autocomplete.show).toHaveBeenCalledWith(['foo']);
         expect(this.autocomplete.caches['foo']).toBeUndefined();
+      });
+
+      it("should fetch results and transform result object", function() {
+        // GIVEN
+        var transformResults = jasmine.createSpy('fn').andCallFake(function(result) {
+          return result.data;
+        });
+
+        this.autocomplete.opts.transformResults = transformResults;
+
+        // WHEN
+        this.autocomplete.fetch('foo');
+
+        // THEN
+        expect(transformResults).not.toHaveBeenCalled();
+        expect(window.clearTimeout).not.toHaveBeenCalled();
+        expect(window.setTimeout).toHaveBeenCalledWith(jasmine.any(Function), 200);
+        expect($.ajax).not.toHaveBeenCalled();
+        expect(this.autocomplete.timer).toBeDefined();
+        expect(this.autocomplete.xhr).toBeDefined();
+
+        window.setTimeout.argsForCall[0][0]();
+
+        expect($.ajax).toHaveBeenCalledWith({
+          url: '/search',
+          type: 'GET',
+          dataType: 'json',
+          data: {
+            filter: 'foo',
+            limit: 10
+          }
+        });
+
+        expect(this.xhr.abort).not.toHaveBeenCalled();
+        expect(this.xhr.done).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.autocomplete.show).not.toHaveBeenCalled();
+
+        var response = {
+          data: ['foo']
+        };
+
+        this.xhr.done.argsForCall[0][0](response);
+
+        expect(this.autocomplete.timer).toBe(null);
+        expect(this.autocomplete.xhr).toBe(null);
+        expect(transformResults).toHaveBeenCalledWith(response);
+        expect(this.autocomplete.show).toHaveBeenCalledWith(['foo']);
+      });
+
+      it("should fetch results using jsonp data type", function() {
+        // GIVEN
+        this.autocomplete.opts.dataType = 'jsonp';
+
+        // WHEN
+        this.autocomplete.fetch('foo');
+
+        // THEN
+        expect(window.setTimeout).toHaveBeenCalledWith(jasmine.any(Function), 200);
+        expect($.ajax).not.toHaveBeenCalled();
+        expect(this.autocomplete.timer).toBeDefined();
+        expect(this.autocomplete.xhr).toBeDefined();
+
+        window.setTimeout.argsForCall[0][0]();
+
+        expect($.ajax).toHaveBeenCalledWith({
+          url: '/search',
+          type: 'GET',
+          dataType: 'jsonp',
+          data: {
+            filter: 'foo',
+            limit: 10
+          }
+        });
+      });
+
+      it("should fetch results using jsonp data type and add jsonp and jsonpCallback parameters", function() {
+        // GIVEN
+        this.autocomplete.opts.jsonp = false;
+        this.autocomplete.opts.jsonpCallback = 'foo';
+        this.autocomplete.opts.dataType = 'jsonp';
+
+        // WHEN
+        this.autocomplete.fetch('foo');
+
+        // THEN
+        expect(window.setTimeout).toHaveBeenCalledWith(jasmine.any(Function), 200);
+        expect($.ajax).not.toHaveBeenCalled();
+        expect(this.autocomplete.timer).toBeDefined();
+        expect(this.autocomplete.xhr).toBeDefined();
+
+        window.setTimeout.argsForCall[0][0]();
+
+        expect($.ajax).toHaveBeenCalledWith({
+          url: '/search',
+          type: 'GET',
+          dataType: 'jsonp',
+          jsonp: false,
+          jsonpCallback: 'foo',
+          data: {
+            filter: 'foo',
+            limit: 10
+          }
+        });
       });
 
       it("should fetch results and store in cache if cache is enable", function() {

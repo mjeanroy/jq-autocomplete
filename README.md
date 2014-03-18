@@ -71,6 +71,9 @@ Note that callbacks are more documented below.
 
 - `url`: URL used to fetch results.
 - `method`: HTTP method used to fetch results. Default is `GET`.
+- `dataType`: Data type expected. Default is `json`.
+- `jsonp`: Override the callback function name in a jsonp request.
+- `jsonpCallback`: Specify the callback function name for a JSONP request.
 - `minSize`: : Minimum number of characters required to trigger autocomplete. Default is `3`.
 - `limit`: Maximum number of results to retrieve (will be sent over http). Default is `10`.
 - `filterName`: Name of parameter containing filter value. Default is `filter`.
@@ -91,6 +94,7 @@ Note that callbacks are more documented below.
 - `unSelect`: Callback function called when selected result is "un-selected".
 - `onShown`: Callback function called when suggestion list is displayed.
 - `onHidden`: Callback function called when suggestion list is hidden.
+- `transformResults`: Callback function called to transform original results to match expected results format (i.e. a valid array).
 - `isValid`: Callback function used to check validity of creation form and called before creation request. If function return a falsy value, creation request will not be triggered.
 - `focusout`: Callback function called when focus out event is triggered.
 - `onSaved`: Callback function called before creation request. Returned object will be used as parameter during creation request (useful to override some parameter).
@@ -125,6 +129,18 @@ Callback called when element is de-selected.
 `function onShown()`
 
 Callback called when suggestions list (or creation form) is displayed.
+
+***
+
+`function transformResults(response) : {array}`
+
+Callback called to transform origin response and return an suggestions as an array.
+
+Parameters:
+- `response` Original response.
+
+Returns:
+Array of suggestions.
 
 ***
 
