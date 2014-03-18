@@ -200,24 +200,7 @@
      * @return {number} Parsed number.
      */
     var toInt = function(val) {
-      return val === undefined ? val : parseInt(val, 10);
-    };
-
-    /**
-     * Convert string value to boolean:
-     * - If value is strictly equals to 'true', then true value is returned.
-     * - Otherwise false value is returned.
-     * @param {*} val Value to convert.
-     * @return {*} Boolean value if parameter is a string, parameter otherwise.
-     */
-    var toBoolean = function(val) {
-      if (val === 'true') {
-        return true;
-      }
-      if (val === 'false') {
-        return false;
-      }
-      return val;
+      return val === undefined || val === null ? val : parseInt(val, 10);
     };
 
     /**
@@ -232,22 +215,6 @@
       } else {
         return str.startsWith(start);
       }
-    };
-
-
-    /**
-     * Turn a string with '-' separator to a camel case string.
-     * @param {string} str String to convert.
-     * @return {string} Camel case string.
-     */
-    var toCamelCase = function(str) {
-        var array = str.split('-');
-        for (var i = 0, ln = array.length; i < ln; ++i) {
-          var current = array[i].toLowerCase();
-          array[i] = current.charAt(0).toUpperCase() + current.splice(1);
-        }
-        array[0] = array[0].toLowerCase();
-        return array.join('');
     };
 
     // Add special event to destroy plugin before it is removed from the DOM
@@ -266,7 +233,7 @@
       that.$input = $(input);
 
       // Override options with data attributes
-      that.opts = $.extend({}, options, that.readDatas());
+      that.opts = $.extend({}, options, that.readData());
 
       that.caches = {};
       that.filter = '';
@@ -372,35 +339,11 @@
        * Read data attributes used to initialize autocomplete.
        * @return {object} Initialization object initialized with data attributes.
        */
-      readDatas: function() {
-        var dataAttrs = {};
-        var $input = this.$input;
+      readData: function() {
+        var dataAttrs = this.$input.data();
 
-        dataAttrs.minSize = data($input, 'min-size');
-        dataAttrs.limit = data($input, 'limit');
-        dataAttrs.url = data($input, 'url');
-        dataAttrs.saveUrl = data($input, 'save-url');
-        dataAttrs.saveMethod = data($input, 'save-method');
-        dataAttrs.saveDataType = data($input, 'save-data-type');
-        dataAttrs.saveContentType = data($input, 'save-content-type');
-        dataAttrs.$createForm = data($input, 'create-form');
-        dataAttrs.createLabel = data($input, 'create-label');
-        dataAttrs.cancel = data($input, 'Cancel');
-        dataAttrs.submit = data($input, 'Submit');
-        dataAttrs.method = data($input, 'method');
-        dataAttrs.limitName = data($input, 'limit-name');
-        dataAttrs.filterName = data($input, 'filter-name');
-        dataAttrs.label = data($input, 'label');
-        dataAttrs.cache = data($input, 'cache') || false;
-        dataAttrs.relativeTo = data($input, 'relative-to');
-        dataAttrs.dataType = data($input, 'data-type');
-        dataAttrs.jsonp = data($input, 'jsonp');
-        dataAttrs.jsonpCallback = data($input, 'jsonp-callback');
-
-        dataAttrs.minSize = toInt(dataAttrs.minSize);
-        dataAttrs.limit = toInt(dataAttrs.limit);
-        dataAttrs.cache = toBoolean(dataAttrs.cache);
-        dataAttrs.jsonp = toBoolean(dataAttrs.jsonp);
+        dataAttrs.$createForm = dataAttrs.createForm;
+        delete dataAttrs.createForm;
 
         return dataAttrs;
       },
