@@ -679,9 +679,12 @@
        * @returns {jQuery} Result object.
        */
       $show: function() {
-        this.positionResult();
-        this.$results.show();
-        this.opts.onShown.call(this);
+        if (!this.$visible) {
+          this.$visible = true;
+          this.positionResult();
+          this.$results.show();
+          this.opts.onShown.call(this);
+        }
       },
 
       /**
@@ -689,9 +692,12 @@
        * @returns {jQuery} Result object.
        */
       $hide: function() {
-        this.$results.hide();
-        this.hideCreationForm();
-        this.opts.onHidden.call(this);
+        if (this.$visible) {
+          this.$results.hide();
+          this.hideCreationForm();
+          this.opts.onHidden.call(this);
+          this.$visible = false;
+        }
       },
 
       /** Show form used to create new item. */

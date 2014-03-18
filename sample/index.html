@@ -27,6 +27,7 @@
   <title>Sample jq-AutoComplete</title>
   <script type="text/javascript" src="jquery/jquery.js"></script>
   <script type="text/javascript" src="jquery/dist/jquery.js"></script>
+  <script type="text/javascript" src="angular/angular.js"></script>
 
   <script type="text/javascript">
     // Set cache to zero (use to test memory leak)
@@ -69,6 +70,34 @@
          data-data-type="jsonp"/>
 </div>
 
+<hr>
+
+<div ng-app="jqAutoComplete">
+  <div ng-controller="Ctrl">
+    Search on github: (angular directive) :
+    <input type="text"
+      jq-autocomplete
+      ng-model="repository"
+      url="https://api.github.com/search/repositories"
+      filter-name="q"
+      label="{{label}}"
+      data-type="jsonp"
+      transform-results="transform($results)"
+      on-shown="onShown()"
+      on-hidden="onHidden()"
+    />
+
+    <p>
+      Selected repository:
+
+      <ul>
+        <li>id: {{repository.id}}</li>
+        <li>name: {{repository.name}}</li>
+      </ul>
+    </p>
+  </div>
+</div>
+
 <form class="form-creation">
   <label for="input-framework-name">Framework Name :</label>
   <input id="input-framework-name" type="text" name="name" required="required"/>
@@ -82,38 +111,8 @@
 <button id="btn-remove" type="button" class="btn btn-primary">Remove</button>
 
 <script type="text/javascript" src="jq-autocomplete.js"></script>
+<script type="text/javascript" src="jq-autocomplete.angular.js"></script>
 
-<script type="text/javascript">
-  var $choice = $('#js-choice');
-
-  $('#js-initialization').jqAutoComplete({
-    url: '/search',
-    saveUrl: '/frameworks',
-    minSize: 3,
-    label: 'label',
-    $createForm: '.form-creation',
-    select: function(obj) {
-      $choice.html(obj.label);
-    },
-    unSelect: function() {
-      $choice.empty();
-    }
-  });
-
-  $('#jsonp-autocomplete').jqAutoComplete({
-    transformResults: function(data) {
-      return data.data.items;
-    }
-  });
-
-  $('#html-initialization').jqAutoComplete();
-
-  $('#btn-remove').on('click', function() {
-    $('#js-initialization').remove();
-
-    // Clear sizzle form cache (size of cache is one, so it will remove form entries)
-    $('button[type!="submit"]');
-  });
-</script>
+<script type="text/javascript" src="main.js"></script>
 </body>
 </html>

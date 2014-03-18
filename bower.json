@@ -20,7 +20,8 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": ">=1.10.2"
+    "jquery": ">=1.10.2",
+    "angular": ">=1.2.0"
   },
   "devDependencies": {
     "bootstrap.css": "2.3.2"

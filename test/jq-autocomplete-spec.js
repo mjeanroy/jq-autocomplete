@@ -507,6 +507,7 @@ describe("jQuery AutoComplete Test Suite", function() {
         { id: 2, label: 'bar' }
       ];
 
+      this.autocomplete.$visible = true;
       this.autocomplete.idx = 0;
       this.autocomplete.results = results;
       this.autocomplete.item = this.autocomplete.results[0];
@@ -543,6 +544,7 @@ describe("jQuery AutoComplete Test Suite", function() {
         { id: 2, label: 'bar' }
       ];
 
+      this.autocomplete.$visible = true;
       this.autocomplete.idx = 0;
       this.autocomplete.results = results;
 
@@ -571,6 +573,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       spyOn(this.autocomplete, 'resetForm').andCallThrough();
       spyOn(this.autocomplete.opts, 'onHidden').andCallThrough();
 
+      this.autocomplete.$visible = true;
       this.autocomplete.idx = 0;
       this.autocomplete.results = this.results;
       this.autocomplete.item = this.results[0];
@@ -619,12 +622,14 @@ describe("jQuery AutoComplete Test Suite", function() {
 
       it("should $hide creation form if form is defined", function() {
         // GIVEN
+        this.autocomplete.$visible = true;
         spyOn(this.autocomplete, 'hideCreationForm').andCallThrough();
 
         // WHEN
         this.autocomplete.$hide();
 
         // THEN
+        expect(this.autocomplete.$visible).toBeFalsy();
         expect(this.autocomplete.hideCreationForm).toHaveBeenCalled();
       });
 
@@ -913,6 +918,7 @@ describe("jQuery AutoComplete Test Suite", function() {
         var fn = jasmine.createSpy('fn');
         this.autocomplete.opts.select = fn;
         this.autocomplete.idx = 0;
+        this.autocomplete.$visible = true;
 
         // WHEN
         this.autocomplete.val('foo');
@@ -934,6 +940,7 @@ describe("jQuery AutoComplete Test Suite", function() {
         };
 
         var fn = jasmine.createSpy('fn');
+        this.autocomplete.$visible = true;
         this.autocomplete.opts.label = 'label';
         this.autocomplete.opts.select = fn;
 
@@ -985,20 +992,88 @@ describe("jQuery AutoComplete Test Suite", function() {
       });
     });
 
-    describe("Check Show Function", function() {
+    describe("Check Show / Hide Function", function() {
       beforeEach(function() {
         spyOn(this.autocomplete, 'positionResult').andCallThrough();
+        spyOn(this.autocomplete, 'hideCreationForm').andCallThrough();
+        spyOn(this.autocomplete, '$show').andCallThrough();
         spyOn(this.autocomplete.opts, 'onShown').andCallThrough();
+        spyOn(this.autocomplete.opts, 'onHidden').andCallThrough();
+      });
+
+      it("should $show if autocomplete was not visible", function() {
+        // GIVEN
+        var data = ['foo', 'bar', 'quix'];
+        this.autocomplete.$visible = false;
+
+        // WHEN
+        this.autocomplete.$show();
+
+        // THEN
+        expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
+
+        expect(this.autocomplete.$ul.show).toHaveBeenCalled();
+        expect(this.autocomplete.positionResult).toHaveBeenCalled();
+        expect(this.autocomplete.$visible).toBeTruthy();
+      });
+
+      it("should not $show if autocomplete is visible", function() {
+        // GIVEN
+        var data = ['foo', 'bar', 'quix'];
+        this.autocomplete.$visible = true;
+
+        // WHEN
+        this.autocomplete.$show();
+
+        // THEN
+        expect(this.autocomplete.opts.onShown).not.toHaveBeenCalled();
+        expect(this.autocomplete.$ul.show).not.toHaveBeenCalled();
+        expect(this.autocomplete.positionResult).not.toHaveBeenCalled();
+        expect(this.autocomplete.$visible).toBeTruthy();
+      });
+
+      it("should $hide if autocomplete is visible", function() {
+        // GIVEN
+        var data = ['foo', 'bar', 'quix'];
+        this.autocomplete.$visible = true;
+
+        // WHEN
+        this.autocomplete.$hide();
+
+        // THEN
+        expect(this.autocomplete.opts.onHidden).toHaveBeenCalled();
+
+        expect(this.autocomplete.$ul.hide).toHaveBeenCalled();
+        expect(this.autocomplete.hideCreationForm).toHaveBeenCalled();
+        expect(this.autocomplete.$visible).toBeFalsy();
+      });
+
+      it("should not $hide if autocomplete is not visible", function() {
+        // GIVEN
+        var data = ['foo', 'bar', 'quix'];
+        this.autocomplete.$visible = false;
+
+        // WHEN
+        this.autocomplete.$hide();
+
+        // THEN
+        expect(this.autocomplete.opts.onHidden).not.toHaveBeenCalled();
+
+        expect(this.autocomplete.$ul.hide).not.toHaveBeenCalled();
+        expect(this.autocomplete.hideCreationForm).not.toHaveBeenCalled();
+        expect(this.autocomplete.$visible).toBeFalsy();
       });
 
       it("should display some strings", function() {
         // GIVEN
         var data = ['foo', 'bar', 'quix'];
+        this.autocomplete.$visible = true;
 
         // WHEN
         this.autocomplete.show(data);
 
         // THEN
+        expect(this.autocomplete.$show).toHaveBeenCalled();
         expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
         expect(this.autocomplete.results).toEqual(data);
@@ -1038,6 +1113,7 @@ describe("jQuery AutoComplete Test Suite", function() {
         this.autocomplete.show(data);
 
         // THEN
+        expect(this.autocomplete.$show).toHaveBeenCalled();
         expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
         expect(this.autocomplete.results).toEqual(data);
@@ -1080,6 +1156,7 @@ describe("jQuery AutoComplete Test Suite", function() {
         this.autocomplete.show(data);
 
         // THEN
+        expect(this.autocomplete.$show).toHaveBeenCalled();
         expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
         expect(this.autocomplete.results).toEqual(data);
@@ -1126,6 +1203,7 @@ describe("jQuery AutoComplete Test Suite", function() {
         this.autocomplete.show(data);
 
         // THEN
+        expect(this.autocomplete.$show).toHaveBeenCalled();
         expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
         expect(this.autocomplete.results).toEqual(data);
@@ -1168,6 +1246,7 @@ describe("jQuery AutoComplete Test Suite", function() {
         this.autocomplete.show(data);
 
         // THEN
+        expect(this.autocomplete.$show).toHaveBeenCalled();
         expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
         expect(this.autocomplete.results).toEqual(data);
@@ -1204,6 +1283,7 @@ describe("jQuery AutoComplete Test Suite", function() {
         this.autocomplete.show(data);
 
         // THEN
+        expect(this.autocomplete.$show).toHaveBeenCalled();
         expect(this.autocomplete.opts.onShown).toHaveBeenCalled();
 
         expect(this.autocomplete.results).toEqual(data);
@@ -1836,6 +1916,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       it("hide results on focusout", function() {
         // GIVEN
         spyOn(this.autocomplete.opts, 'focusout').andCallThrough();
+        this.autocomplete.$visible = true;
         this.autocomplete.$input.val('foo');
 
         // WHEN
@@ -1897,6 +1978,7 @@ describe("jQuery AutoComplete Test Suite", function() {
       it("should not fetch results if filter is too small", function() {
         // GIVEN
         this.keyupEvent.keyCode = 25;
+        this.autocomplete.$visible = true;
         this.autocomplete.$input.val('foo');
         this.autocomplete.opts.minSize = 5;
 
