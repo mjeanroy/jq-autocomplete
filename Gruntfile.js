@@ -15,6 +15,12 @@ module.exports = function(grunt) {
     clean: ['build/', 'release/'],
 
     copy: {
+      dist: {
+        expand: true,
+        cwd: 'src/',
+        src: '**',
+        dest: 'build/'
+      },
       release: {
         expand: true,
         cwd: 'build/',
@@ -23,13 +29,29 @@ module.exports = function(grunt) {
       }
     },
 
+    concat: {
+      options: {
+        separator: ';',
+      },
+      dist: {
+        src: ['src/jq-autocomplete.js', 'src/jq-autocomplete-angular.js'],
+        dest: 'build/jq-autocomplete-angular-full.js',
+      },
+    },
+
     uglify: {
       options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+        sourceMap: true,
       },
       build: {
-        src: 'src/<%= pkg.name %>.js',
-        dest: 'build/<%= pkg.name %>.min.js'
+        files: [{
+          expand: true,
+          src: ['**/*.js'],
+          dest: 'build/',
+          cwd: 'build/',
+          ext: '.min.js'
+        }]
       }
     },
 
@@ -109,8 +131,9 @@ module.exports = function(grunt) {
   // Load clean task
   grunt.loadNpmTasks('grunt-contrib-clean');
 
-  // Load the plugin that provides the "uglify" task.
+  // Load the plugin that provides the "concat" and "uglify" task.
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-concat');
 
   // Load cssmin task
   grunt.loadNpmTasks('grunt-contrib-cssmin');
@@ -147,6 +170,8 @@ module.exports = function(grunt) {
     'clean',
     'jshint',
     'karma:continuous',
+    'copy:dist',
+    'concat',
     'uglify',
     'cssmin:minify'
   ]);
