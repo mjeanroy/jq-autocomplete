@@ -31,7 +31,19 @@ module.exports = function(config) {
         included: true
       },
       {
-        pattern: 'src/*.js',
+        pattern: 'components/angular-mocks/angular-mocks.js',
+        watched: false,
+        served: true,
+        included: true
+      },
+      {
+        pattern: 'src/jq-autocomplete.js',
+        watched: true,
+        served: true,
+        included: true
+      },
+      {
+        pattern: 'src/jq-autocomplete.angular.js',
         watched: true,
         served: true,
         included: true

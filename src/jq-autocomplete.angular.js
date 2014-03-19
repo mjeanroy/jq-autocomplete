@@ -1,16 +1,49 @@
-(function(angular, $) {
+(function(angular, $, window) {
 
   'use strict';
 
   var module = angular.module('jqAutoComplete', []);
 
-  module.directive('jqAutocomplete', function() {
+  module.directive('jqAutocomplete', ['$timeout', function($timeout) {
     return {
-      restrict: 'EA',
+      restrict: 'A',
       link: function(scope, tElement, tAttrs) {
-        var $input = angular.element(tElement).find('input');
+        var $input = angular.element(tElement);
 
-        var opts = angular.extend(tAttrs, {
+        var opts = {};
+        var defaults = $.fn.jqAutoComplete.options;
+
+        var obj = scope.$eval(tAttrs.jqAutocomplete);
+        if (angular.isObject(obj)) {
+          opts = obj;
+        } else {
+          angular.forEach(defaults, function(value, name) {
+            var attrValue = tAttrs[name];
+            if (angular.isDefined(attrValue)) {
+              opts[name] = attrValue;
+            }
+          });
+        }
+
+        var onSelection = function(obj) {
+          scope.$apply(function() {
+            var value = $input.val();
+
+            scope.selected = obj;
+
+            $timeout(function() {
+              scope.onSelection({
+                $value: value,
+                $selected: scope.selected
+              });
+
+              scope.ngChange();
+            });
+          });
+        };
+
+        opts = angular.extend(opts, {
+          parseHtml: false,
           transformResults: function(data) {
             var results = scope.transformResults({
               $results: data
@@ -19,25 +52,25 @@
           },
           onShown: function() {
             scope.$apply(function() {
-              scope.onShown();
+              scope.onShown({
+                $value: $input.val(),
+                $selected: scope.selected
+              });
             });
           },
           onHidden: function() {
             scope.$apply(function() {
-              scope.onHidden();
+              scope.onHidden({
+                $value: $input.val(),
+                $selected: scope.selected
+              });
             });
           },
           select: function(obj) {
-            scope.$apply(function() {
-              scope.ngModel = obj;
-              scope.ngChange();
-            });
+            onSelection(obj);
           },
           unSelect: function() {
-            scope.$apply(function() {
-              scope.ngModel = undefined;
-              scope.ngChange();
-            });
+            onSelection(undefined);
           },
           onDestroyed: function() {
             scope.$apply(function() {
@@ -50,25 +83,24 @@
 
         scope.$on('$destroy', function() {
           $autocomplete.destroy();
+
+          // Prevent memory leak
           $autocomplete = null;
+          onSelection = null;
         });
       },
       scope: {
-        ngModel: '=',
         ngChange: '&',
-        onShown: '&',
-        onHidden: '&',
-        onDestroyed: '&',
-        transformResults: '&'
+        selected: '=?jqAcSelected',
+        onSelection: '&jqAcOnSelection',
+        onShown: '&jqAcOnShown',
+        onHidden: '&jqAcOnHidden',
+        onDestroyed: '&jqAcOnDestroyed',
+        transformResults: '&jqAcTransformResults'
       },
-      template: function() {
-        return '' +
-          '<span>' +
-          '  <input type="text" />' +
-          '</span>';
-      },
+      template: '<input type="text" />',
       replace: true
     };
-  });
+  }]);
 
-})(angular, jQuery);
+})(angular, jQuery, window);

@@ -74,19 +74,29 @@
 
 <div ng-app="jqAutoComplete">
   <div ng-controller="Ctrl">
-    Search on github: (angular directive) :
-    <input type="text"
-      jq-autocomplete
-      ng-model="repository"
-      url="https://api.github.com/search/repositories"
-      filter-name="q"
-      label="{{label}}"
-      data-type="jsonp"
-      transform-results="transform($results)"
-      on-shown="onShown()"
-      on-hidden="onHidden()"
-    />
+    <form name="myForm">
+      <div>
+        Search on github: (angular directive using attributes initialization) :
+        <input type="text"
+          name="foo"
 
+          data-ng-model="repository.name"
+          data-ng-change="onChange(repository.name)"
+          data-ng-required="true"
+
+          data-jq-autocomplete
+          data-url="https://api.github.com/search/repositories"
+          data-filter-name="q"
+          data-label="{{label}}"
+          data-data-type="jsonp"
+          data-jq-ac-selected="repository"
+          data-jq-ac-on-selection="onSelection(repository, $value)"
+          data-jq-ac-transform-results="transform($results)"
+          data-jq-ac-on-shown="onShown()"
+          data-jq-ac-on-hidden="onHidden()"
+        />
+      </div>
+    </form>
     <p>
       Selected repository:
 

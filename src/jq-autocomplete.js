@@ -233,7 +233,8 @@
       that.$input = $(input);
 
       // Override options with data attributes
-      that.opts = $.extend({}, options, that.readData());
+      var htmlData = options.parseHtml ? that.readData() : {};
+      that.opts = $.extend({}, options, htmlData);
 
       that.caches = {};
       that.filter = '';
@@ -796,7 +797,7 @@
 
           var onDone = function(data) {
             that.opts.onSavedSuccess.apply(null, arguments);
-            that.val(data);
+            that.set(data);
             that.$hide();
           };
 
@@ -819,7 +820,7 @@
        * Set item as selected value.
        * @param {*} obj Object to select.
        */
-      val: function(obj) {
+      set: function(obj) {
         var that = this;
         that.item = obj;
         that.filter = that.renderItem(obj);
@@ -827,6 +828,14 @@
         that.$hide();
         that.idx = -1;
         that.opts.select.call(that, obj);
+      },
+
+      /**
+       * Get selected value.
+       * @param {*} Selected value.
+       */
+      get: function() {
+        return this.item;
       },
 
       /**
@@ -849,7 +858,7 @@
        */
       select: function(idx) {
         if (idx >= 0 && idx < this.results.length) {
-          this.val(this.results[idx]);
+          this.set(this.results[idx]);
         }
       },
 
@@ -1014,22 +1023,12 @@
         $that.removeData(PLUGIN_NAME);
       };
 
-      /** Get/Set value */
-      that.val = function(obj) {
-        var autocomplete = $that.data(PLUGIN_NAME);
-        if (obj) {
-          autocomplete.val(obj);
-          return that;
-        }
-        return autocomplete.item;
-      };
-
       // Shortcuts to functions
-      $.each(['hide', 'show', 'clearCache', 'empty', 'clear'], function(idx, value) {
+      $.each(['hide', 'show', 'clearCache', 'empty', 'clear', 'get', 'set'], function(idx, value) {
         that[value] = function() {
           var plugin = $that.data(PLUGIN_NAME);
-          plugin[value].apply(plugin, arguments);
-          return that;
+          var result = plugin[value].apply(plugin, arguments);
+          return result !== undefined ? result : that;
         };
       });
 
@@ -1073,6 +1072,7 @@
       onSavedFailed: noop,
       isValid: fnTrue,
       relativeTo: null,
+      parseHtml: true,
       transformResults: identity,
       focusout: noop,
       select: noop,

@@ -41,6 +41,19 @@
 
     $scope.label = 'name';
 
+    $scope.onChange = function(repositoryName) {
+      console.log('on change: ', repositoryName);
+    };
+
+    $scope.onSelection = function(repository, $value) {
+      console.log('on selection: ', repository, ' -- ', $value);
+      if (!repository) {
+        $scope.repository = {
+          name: $value
+        };
+      }
+    };
+
     $scope.onShown = function() {
       console.log('on shown');
     };
@@ -50,7 +63,7 @@
     };
 
     $scope.transform = function(results) {
-      return results.items;
+      return results.data.items;
     };
   }]);
 
