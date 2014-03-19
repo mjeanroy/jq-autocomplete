@@ -43,7 +43,7 @@ module.exports = function(config) {
         included: true
       },
       {
-        pattern: 'src/jq-autocomplete.angular.js',
+        pattern: 'src/jq-autocomplete-angular.js',
         watched: true,
         served: true,
         included: true
